@@ -94,13 +94,31 @@ const OrnamentalDivider: React.FC<OrnamentalDividerProps> = ({ mode = 'evil' }) 
   return (
     <Wrap aria-hidden style={{ color: isRegular ? 'var(--bg)' : undefined }}>
       <Row>
-        <Track $duration={24}>{dup(top)}</Track>
+        <Track
+          $duration={48}
+          $direction="normal"
+          $delay={0}
+        >
+          {dup(top)}
+        </Track>
       </Row>
       <Row>
-        <Track $duration={18} $direction="reverse">{dup(mid)}</Track>
+        <Track
+          $duration={36}
+          $direction="reverse"
+          $delay={0}
+        >
+          {dup(mid)}
+        </Track>
       </Row>
       <Row>
-        <Track $duration={30}>{dup(bot)}</Track>
+        <Track
+          $duration={60}
+          $direction="normal"
+          $delay={0}
+        >
+          {dup(bot)}
+        </Track>
       </Row>
     </Wrap>
   );
