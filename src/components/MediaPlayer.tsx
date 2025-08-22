@@ -209,13 +209,15 @@ const SwipeIndicator = styled.div`
   left: 50%;
   transform: translate(-50%, -50%);
   color: white; /* Base color, mix-blend-mode will invert it */
-  font-size: 0.8rem;
+  font-size: 1rem; /* Increased from 0.8rem */
   opacity: 0.9;
   pointer-events: none;
   z-index: 15;
   mix-blend-mode: difference; /* Automatically invert colors based on background */
   font-weight: 500;
   text-shadow: none;
+  /* Ensure it blends with page background, not just thumbnail */
+  isolation: isolate;
 
   @media (max-width: 768px) {
     display: block;
