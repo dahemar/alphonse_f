@@ -25,7 +25,7 @@ const AppContainer = styled.div<{ $mode: Mode }>`
   /* Mobile responsive padding and layout */
   @media (max-width: 768px) {
     padding: 1rem;
-    padding-top: 4rem; /* Add top margin to avoid collision with mode switcher */
+    padding-top: 2.5rem; /* tighter to fit content on one screen */
   }
 `;
 
@@ -39,7 +39,7 @@ const ContentWrapper = styled.div`
     text-align: left;
     max-width: 100%;
     overflow-x: hidden;
-    width: 100vw;
+    width: 100%; /* avoid 100vw which can cause overflow on iOS */
   }
 `;
 
@@ -161,7 +161,7 @@ const TitleAccent = styled.span`
 // Mobile-specific title without 's'
 const MobileTitle = styled.h1`
   display: none;
-  margin: 0 0 0.8rem 0;
+  margin: 0 0 0.6rem 0;
   font-size: clamp(2rem, 8vw, 2.6rem);
   font-weight: 700;
   line-height: 1.1;

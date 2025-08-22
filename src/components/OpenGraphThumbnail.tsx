@@ -54,7 +54,7 @@ const ThumbnailWrapper = styled.div<{ $isActive: boolean; $size: 'large' | 'smal
   /* Mobile optimizations */
   @media (max-width: 768px) {
     height: ${props => props.$size === 'large' ? '180px' : '120px'};
-    margin-bottom: 0.4rem;
+    margin-bottom: 0.2rem; /* tighter */
     border-width: ${props => props.$isActive ? '3px' : '2px'};
   }
 `;

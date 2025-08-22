@@ -13,7 +13,10 @@ const Wrap = styled.div`
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin: 1.5rem 0 2rem 0;
+    margin: 0.75rem 0 1rem 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
   }
 `;
 

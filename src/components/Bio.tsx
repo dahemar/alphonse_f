@@ -6,7 +6,7 @@ const BioContainer = styled.div`
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin-bottom: 2.5rem;
+    margin-bottom: 1.25rem;
   }
 `;
 
@@ -24,8 +24,8 @@ const BioText = styled.p`
 
   /* Mobile font scaling and line height */
   @media (max-width: 768px) {
-    font-size: clamp(1rem, 4.5vw, 1.2rem);
-    line-height: 1.5;
+    font-size: clamp(0.95rem, 4vw, 1.1rem);
+    line-height: 1.3;
     letter-spacing: 0.01em;
     max-width: 100%;
     text-align: left; /* Keep left alignment */
