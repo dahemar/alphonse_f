@@ -208,11 +208,16 @@ const SwipeIndicator = styled.div`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: var(--accent1);
+  color: var(--bg); /* Use background color (opposite of text) */
   font-size: 0.8rem;
-  opacity: 0.6;
+  opacity: 0.9; /* Higher opacity for better contrast */
   pointer-events: none;
   z-index: 15;
+  background: var(--fg); /* Use foreground color as background */
+  padding: 0.5rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 500;
+  text-shadow: none; /* Remove any text shadow */
 
   @media (max-width: 768px) {
     display: block;
