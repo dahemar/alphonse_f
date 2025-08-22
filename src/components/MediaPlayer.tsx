@@ -120,7 +120,6 @@ const TrackRow = styled.div`
   /* Mobile gap adjustment */
   @media (max-width: 768px) {
     gap: 0.4rem;
-    justify-content: center; /* Center the entire row */
     align-items: center;
   }
 `;
