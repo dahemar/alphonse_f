@@ -188,6 +188,32 @@ function App() {
   const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
   const [mode, setMode] = useState<Mode>('regular');
 
+  // Hard lock viewport scrolling on mobile/iOS while allowing horizontal swipe on carousel
+  React.useEffect(() => {
+    const preventIfNotCarousel = (e: Event) => {
+      const target = e.target as Element | null;
+      if (target && target.closest && target.closest('.carousel-touch-area')) {
+        return; // allow interactions within the carousel touch area
+      }
+      e.preventDefault();
+    };
+    const lockScroll = () => {
+      if (window.scrollY !== 0) window.scrollTo(0, 0);
+    };
+
+    document.addEventListener('touchmove', preventIfNotCarousel, { passive: false });
+    document.addEventListener('wheel', preventIfNotCarousel, { passive: false } as any);
+    window.addEventListener('scroll', lockScroll, { passive: false } as any);
+    document.addEventListener('gesturestart', preventIfNotCarousel as any, { passive: false } as any);
+
+    return () => {
+      document.removeEventListener('touchmove', preventIfNotCarousel as any);
+      document.removeEventListener('wheel', preventIfNotCarousel as any);
+      window.removeEventListener('scroll', lockScroll as any);
+      document.removeEventListener('gesturestart', preventIfNotCarousel as any);
+    };
+  }, []);
+
   const links = [
     {
       url: 'https://www.papermag.com/palmistry-tinkerbell-interview',
