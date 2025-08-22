@@ -95,7 +95,7 @@ const OrnamentalDivider: React.FC<OrnamentalDividerProps> = ({ mode = 'evil' }) 
     <Wrap aria-hidden style={{ color: isRegular ? 'var(--bg)' : undefined }}>
       <Row>
         <Track
-          $duration={48}
+          $duration={96}
           $direction="normal"
           $delay={0}
         >
@@ -104,7 +104,7 @@ const OrnamentalDivider: React.FC<OrnamentalDividerProps> = ({ mode = 'evil' }) 
       </Row>
       <Row>
         <Track
-          $duration={36}
+          $duration={72}
           $direction="reverse"
           $delay={0}
         >
@@ -113,7 +113,7 @@ const OrnamentalDivider: React.FC<OrnamentalDividerProps> = ({ mode = 'evil' }) 
       </Row>
       <Row>
         <Track
-          $duration={60}
+          $duration={120}
           $direction="normal"
           $delay={0}
         >
