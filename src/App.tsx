@@ -188,6 +188,66 @@ function App() {
   const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
   const [mode, setMode] = useState<Mode>('regular');
 
+  // Robust page scroll lock: vertical fixed at top, horizontal fixed at page center
+  React.useEffect(() => {
+    const computeLock = () => {
+      const doc = document.documentElement;
+      const pageWidth = doc.scrollWidth;
+      const viewportWidth = window.innerWidth;
+      const lockY = 0; // top of the page
+      const lockX = Math.max(0, Math.round((pageWidth - viewportWidth) / 2));
+      return { lockX, lockY };
+    };
+
+    let { lockX, lockY } = computeLock();
+    if (window.scrollX !== lockX || window.scrollY !== lockY) {
+      window.scrollTo(lockX, lockY);
+    }
+
+    const onScroll = () => {
+      // Re-pin to locked coordinates
+      if (window.scrollX !== lockX || window.scrollY !== lockY) {
+        window.scrollTo(lockX, lockY);
+      }
+    };
+
+    const preventScrollDefault = (e: Event) => {
+      // Prevent browser scrolling while allowing gesture events to bubble to React handlers
+      const target = e.target as Element | null;
+      if (target && target.closest && target.closest('.carousel-touch-area')) {
+        // We still want to block page scroll even inside carousel
+        e.preventDefault();
+        return;
+      }
+      e.preventDefault();
+    };
+
+    const onResize = () => {
+      const v = computeLock();
+      lockX = v.lockX;
+      lockY = v.lockY;
+      window.scrollTo(lockX, lockY);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: false } as any);
+    window.addEventListener('resize', onResize);
+    document.addEventListener('wheel', preventScrollDefault, { passive: false });
+    document.addEventListener('touchmove', preventScrollDefault, { passive: false });
+    document.addEventListener('gesturestart', preventScrollDefault as any, { passive: false } as any);
+    document.addEventListener('keydown', (e) => {
+      const keys = ['ArrowUp', 'ArrowDown', 'PageUp', 'PageDown', 'Home', 'End', ' ', 'Spacebar'];
+      if (keys.includes(e.key)) e.preventDefault();
+    }, { passive: false } as any);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll as any);
+      window.removeEventListener('resize', onResize);
+      document.removeEventListener('wheel', preventScrollDefault as any);
+      document.removeEventListener('touchmove', preventScrollDefault as any);
+      document.removeEventListener('gesturestart', preventScrollDefault as any);
+    };
+  }, []);
+
   const links = [
     {
       url: 'https://www.papermag.com/palmistry-tinkerbell-interview',
