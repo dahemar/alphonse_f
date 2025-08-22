@@ -247,7 +247,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
       targetX = nx;
     }
     setTrackX(targetX);
-  }, [isMobile]);
+  }, []);
 
   // Use custom touch gestures hook
   const { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping } = useTouchGestures(
@@ -396,7 +396,8 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   // Keep centered when currentIndex changes externally
   React.useEffect(() => {
     scrollToCenterItem(currentIndex);
-  }, [currentIndex, scrollToCenterItem]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
 
   // Render only visible thumbnails on mobile for performance
   const renderThumbnails = () => {
