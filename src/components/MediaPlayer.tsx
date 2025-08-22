@@ -494,7 +494,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           </OverlayLayer>
           {isMobile && (
             <SwipeIndicator>
-              {isSwiping ? 'Swipe to navigate' : '← swipe to navigate →'}
+              {'← swipe to navigate →'}
             </SwipeIndicator>
           )}
         </Viewport>
