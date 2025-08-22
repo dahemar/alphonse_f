@@ -34,7 +34,7 @@ const CurrentTrack = styled.div`
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.75rem;
   }
 `;
 
@@ -79,7 +79,7 @@ const PlaylistSection = styled.div`
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin-top: 1rem;
+    margin-top: 0.5rem;
     margin-bottom: 0;
   }
 `;
@@ -93,7 +93,7 @@ const Viewport = styled.div`
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
-    height: 140px;
+    height: 120px;
     max-width: 100vw;
     width: 100vw;
     touch-action: pan-y pinch-zoom;
@@ -111,7 +111,7 @@ const TrackRow = styled.div`
 
   /* Mobile gap adjustment */
   @media (max-width: 768px) {
-    gap: 0.6rem;
+    gap: 0.4rem;
   }
 `;
 
@@ -182,10 +182,10 @@ const TrackItem = styled.div`
 
   /* Mobile: force exactly 3 thumbnails to fit viewport width */
   @media (max-width: 768px) {
-    /* Two gaps of 0.6rem inside the viewport */
-    flex: 0 0 calc((100vw - 1.2rem) / 3);
-    max-width: calc((100vw - 1.2rem) / 3);
-    min-width: calc((100vw - 1.2rem) / 3);
+    /* Two gaps of 0.4rem inside the viewport */
+    flex: 0 0 calc((100vw - 0.8rem) / 3);
+    max-width: calc((100vw - 0.8rem) / 3);
+    min-width: calc((100vw - 0.8rem) / 3);
   }
 `;
 
