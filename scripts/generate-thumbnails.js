@@ -59,37 +59,44 @@ function copyFallbackImages() {
 async function copyThumbnails() {
   console.log('🚀 Preparing thumbnails for build...');
 
-  const source = pickSource();
-  if (!source) {
-    console.log('❌ No thumbnail source found. Run snapshot-local-thumbnails.js or extract-working-thumbnails.js first.');
-  }
+  try {
+    const source = pickSource();
+    if (!source) {
+      console.log('ℹ️  No thumbnail source found. This is normal for CI builds. Skipping thumbnail generation.');
+      // Create minimal metadata file to prevent build failure
+      const metadata = [];
+      const metadataPath = path.join(buildDir, 'thumbnail-data.json');
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+      console.log('✅ Created empty thumbnail-data.json for build');
+      return;
+    }
 
-  // Create directories
-  if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
-  if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
-  if (!fs.existsSync(thumbnailsDir)) fs.mkdirSync(thumbnailsDir, { recursive: true });
+    // Create directories
+    if (!fs.existsSync(buildDir)) fs.mkdirSync(buildDir, { recursive: true });
+    if (!fs.existsSync(assetsDir)) fs.mkdirSync(assetsDir, { recursive: true });
+    if (!fs.existsSync(thumbnailsDir)) fs.mkdirSync(thumbnailsDir, { recursive: true });
 
-  // Always copy user-provided fallback images
-  copyFallbackImages();
+    // Always copy user-provided fallback images
+    copyFallbackImages();
 
-  const metadata = [];
+    const metadata = [];
 
-  if (source) {
-    // Load metadata
-    const items = JSON.parse(fs.readFileSync(source.metaPath, 'utf8'));
-    console.log(`📁 Using ${items.length} items from ${source.label}`);
+    if (source) {
+      // Load metadata
+      const items = JSON.parse(fs.readFileSync(source.metaPath, 'utf8'));
+      console.log(`📁 Using ${items.length} items from ${source.label}`);
 
-    for (const item of items) {
-      const src = path.join(source.dir, item.localImage);
-      const dst = path.join(thumbnailsDir, item.localImage);
-      if (!fs.existsSync(src)) {
-        console.log(`⚠️  Missing source image: ${src}`);
-        continue;
-      }
-      fs.copyFileSync(src, dst);
-      console.log(`✅ Copied: ${item.localImage}`);
+      for (const item of items) {
+        const src = path.join(source.dir, item.localImage);
+        const dst = path.join(thumbnailsDir, item.localImage);
+        if (!fs.existsSync(src)) {
+          console.log(`⚠️  Missing source image: ${src}`);
+          continue;
+        }
+        fs.copyFileSync(src, dst);
+        console.log(`✅ Copied: ${item.localImage}`);
 
-              metadata.push({
+        metadata.push({
           title: item.title,
           description: item.description || '',
           image: `/alphonse_f/assets/thumbnails/${item.localImage}`,
@@ -97,13 +104,27 @@ async function copyThumbnails() {
           domain: item.domain,
           localImage: item.localImage
         });
+      }
+    }
+
+    const metadataPath = path.join(buildDir, 'thumbnail-data.json');
+    fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+    console.log(`\n✅ Metadata saved to: ${metadataPath}`);
+    console.log('🎉 Thumbnails ready.');
+  } catch (error) {
+    console.error('❌ Error during thumbnail generation:', error.message);
+    console.log('⚠️  Continuing build without thumbnails...');
+    
+    // Create minimal metadata file to prevent build failure
+    try {
+      const metadata = [];
+      const metadataPath = path.join(buildDir, 'thumbnail-data.json');
+      fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
+      console.log('✅ Created fallback thumbnail-data.json');
+    } catch (fallbackError) {
+      console.error('❌ Failed to create fallback metadata:', fallbackError.message);
     }
   }
-
-  const metadataPath = path.join(buildDir, 'thumbnail-data.json');
-  fs.writeFileSync(metadataPath, JSON.stringify(metadata, null, 2));
-  console.log(`\n✅ Metadata saved to: ${metadataPath}`);
-  console.log('🎉 Thumbnails ready.');
 }
 
 if (require.main === module) {
