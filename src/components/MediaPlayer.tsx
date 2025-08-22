@@ -115,10 +115,13 @@ const TrackRow = styled.div`
   height: 100%;
   will-change: transform;
   transition: transform 0.2s ease-out; /* Smooth transition for auto-scroll */
+  align-items: center; /* Center items vertically */
 
   /* Mobile gap adjustment */
   @media (max-width: 768px) {
     gap: 0.4rem;
+    justify-content: center; /* Center the entire row */
+    align-items: center;
   }
 `;
 
@@ -185,7 +188,7 @@ const ArrowButton = styled.button<{ $direction: 'left' | 'right' }>`
 
 const TrackItem = styled.div`
   flex: 0 0 auto;
-  scroll-snap-align: start;
+  scroll-snap-align: center; /* Center alignment instead of start */
 
   /* Mobile: force exactly 3 thumbnails to fit viewport width */
   @media (max-width: 768px) {
@@ -193,6 +196,9 @@ const TrackItem = styled.div`
     flex: 0 0 calc((100vw - 0.8rem) / 3);
     max-width: calc((100vw - 0.8rem) / 3);
     min-width: calc((100vw - 0.8rem) / 3);
+    display: flex;
+    justify-content: center; /* Center content within each item */
+    align-items: center;
   }
 `;
 
