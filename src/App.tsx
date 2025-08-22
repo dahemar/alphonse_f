@@ -192,19 +192,20 @@ function App() {
   React.useEffect(() => {
     const computeLock = () => {
       const scrollEl = document.scrollingElement || document.documentElement;
-      const vv = (window as any).visualViewport as VisualViewport | undefined;
-      const viewportWidth = vv ? vv.width : window.innerWidth;
-      const pageLeft = vv ? (vv as any).pageLeft || 0 : 0;
+      const layoutViewportWidth = document.documentElement.clientWidth;
+      const totalScrollWidth = Math.max(
+        scrollEl.scrollWidth,
+        document.documentElement.scrollWidth,
+        layoutViewportWidth
+      );
 
-      const scrollWidth = Math.max(scrollEl.scrollWidth, scrollEl.clientWidth);
       const lockY = 0; // top of the page
 
-      // Center relative to total scrollable width and adjust by visual viewport page offset
-      const rawCenter = (scrollWidth - viewportWidth) / 2;
-      let lockX = Math.round(rawCenter - pageLeft);
+      // Center based on layout viewport width (stable) vs total scrollable width
+      let lockX = Math.round((totalScrollWidth - layoutViewportWidth) / 2);
 
       // Clamp to valid scrollable bounds
-      const maxX = Math.max(0, scrollWidth - viewportWidth);
+      const maxX = Math.max(0, totalScrollWidth - layoutViewportWidth);
       if (lockX < 0) lockX = 0;
       if (lockX > maxX) lockX = maxX;
 
@@ -235,6 +236,7 @@ function App() {
 
     window.addEventListener('scroll', onScroll, { passive: false } as any);
     window.addEventListener('resize', recalc);
+    window.addEventListener('orientationchange', recalc as any);
     if ((window as any).visualViewport) {
       const vv = (window as any).visualViewport as VisualViewport;
       vv.addEventListener('resize', recalc);
@@ -251,6 +253,7 @@ function App() {
     return () => {
       window.removeEventListener('scroll', onScroll as any);
       window.removeEventListener('resize', recalc);
+      window.removeEventListener('orientationchange', recalc as any);
       if ((window as any).visualViewport) {
         const vv = (window as any).visualViewport as VisualViewport;
         vv.removeEventListener('resize', recalc);
