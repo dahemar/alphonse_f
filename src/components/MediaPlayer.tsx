@@ -19,6 +19,7 @@ interface MediaPlayerProps {
 const PlayerContainer = styled.div`
   width: 100%;
   color: var(--fg);
+  overflow: hidden; /* prevent any horizontal spill */
 `;
 
 const CurrentTrack = styled.div`

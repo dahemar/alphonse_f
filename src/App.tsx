@@ -7,7 +7,7 @@ import OrnamentalDivider from './components/OrnamentalDivider';
 type Mode = 'evil' | 'angel' | 'regular';
 
 const AppContainer = styled.div<{ $mode: Mode }>`
-  min-height: 100vh;
+  min-height: 100dvh; /* use dynamic viewport height */
   /* Color scheme variables per mode */
   --bg: ${p => (p.$mode === 'evil' ? '#000000' : p.$mode === 'angel' ? '#FFFFFF' : '#FFFFFF')};
   --fg: ${p => (p.$mode === 'evil' ? '#FFFF00' : p.$mode === 'angel' ? '#1A73E8' : '#000000')};
