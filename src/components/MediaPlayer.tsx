@@ -193,10 +193,10 @@ const TrackItem = styled.div`
 
   /* Mobile: force exactly 3 thumbnails to fit viewport width */
   @media (max-width: 768px) {
-    /* Two gaps of 0.4rem inside the viewport */
-    flex: 0 0 calc((100vw - 0.8rem) / 3);
-    max-width: calc((100vw - 0.8rem) / 3);
-    min-width: calc((100vw - 0.8rem) / 3);
+    /* Two gaps of 0.4rem inside the viewport; use container width to avoid overflow */
+    flex: 0 0 calc((100% - 0.8rem) / 3);
+    max-width: calc((100% - 0.8rem) / 3);
+    min-width: calc((100% - 0.8rem) / 3);
     display: flex;
     justify-content: center; /* Center content within each item */
     align-items: center;

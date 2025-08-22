@@ -25,7 +25,7 @@ const AppContainer = styled.div<{ $mode: Mode }>`
   /* Mobile responsive padding and layout */
   @media (max-width: 768px) {
     padding: 1rem;
-    padding-top: 2.5rem; /* tighter to fit content on one screen */
+    padding-top: calc(3.25rem + env(safe-area-inset-top)); /* extra margin + iOS safe area */
   }
 `;
 
