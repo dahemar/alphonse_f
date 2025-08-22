@@ -104,7 +104,7 @@ const Viewport = styled.div`
     height: 128px; /* slightly taller to avoid cropping bottom */
     max-width: 100%;
     width: 100%;
-    touch-action: pan-x; /* allow only horizontal panning */
+    touch-action: none; /* block all touch gestures to prevent horizontal scroll */
     margin-bottom: 0;
     overflow-x: hidden;
   }
