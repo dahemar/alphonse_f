@@ -51,8 +51,7 @@ const Track = styled(BaseText)<{ $duration: number; $direction?: 'normal' | 'rev
 
   /* Mobile performance optimizations */
   @media (max-width: 768px) {
-    /* Reduce animation complexity on mobile for better performance */
-    animation-duration: ${p => p.$duration * 0.8}s;
+    /* Keep same animation speed as desktop */
     
     /* Disable animations on low-end devices */
     @media (prefers-reduced-motion: reduce) {
