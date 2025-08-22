@@ -94,9 +94,11 @@ const Viewport = styled.div`
   /* Mobile optimizations */
   @media (max-width: 768px) {
     height: 140px;
-    max-width: 100%;
+    max-width: 100vw;
+    width: 100vw;
     touch-action: pan-y pinch-zoom;
     margin-bottom: 0;
+    overflow-x: hidden;
   }
 `;
 

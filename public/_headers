@@ -1,0 +1,29 @@
+/assets/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/images/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/working-thumbnails/*
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.webp
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.jpg
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+/*.png
+  Access-Control-Allow-Origin: *
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff

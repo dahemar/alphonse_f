@@ -38,6 +38,8 @@ const ContentWrapper = styled.div`
   @media (max-width: 768px) {
     text-align: left;
     max-width: 100%;
+    overflow-x: hidden;
+    width: 100vw;
   }
 `;
 
