@@ -107,7 +107,7 @@ const TrackRow = styled.div`
   gap: 0.8rem;
   height: 100%;
   will-change: transform;
-  transition: transform 0.3s ease-out; /* Smooth transition for auto-scroll */
+  transition: transform 0.2s ease-out; /* Smooth transition for auto-scroll */
 
   /* Mobile gap adjustment */
   @media (max-width: 768px) {
