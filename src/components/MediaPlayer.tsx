@@ -469,6 +469,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
           onTouchCancel={onTouchCancel}
+          className="carousel-touch-area"
         >
           <TrackRow ref={trackRef} style={{ transform: `translate3d(${trackX}px, 0, 0)`, transition: isSwiping ? 'none' : undefined }}>
             {renderThumbnails()}
