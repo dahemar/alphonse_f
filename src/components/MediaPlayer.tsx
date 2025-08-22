@@ -216,17 +216,61 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   const [trackX, setTrackX] = React.useState(0);
   const segmentWidthRef = React.useRef<number>(0);
 
+  // Helper function for auto-scrolling to center selected item (mobile + desktop)
+  const scrollToCenterItem = React.useCallback((index: number) => {
+    const viewport = viewportRef.current;
+    const track = trackRef.current;
+    if (!viewport || !track) return;
+
+    const viewportRect = viewport.getBoundingClientRect();
+    const viewportWidth = viewportRect.width;
+
+    // Calculate gap between items
+    const style = window.getComputedStyle(track);
+    const gap = parseFloat((style as any).columnGap || (style as any).gap || '0') || 0;
+
+    // Estimate item width using the first child if present
+    const firstChild = track.children[0] as HTMLElement | undefined;
+    const itemWidth = firstChild ? firstChild.getBoundingClientRect().width : 120;
+
+    // Desired target position to center the selected index
+    let targetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
+
+    if (!isMobile) {
+      // Desktop: apply wrapping within the duplicated track for infinite scroll
+      const segmentWidth = segmentWidthRef.current;
+      if (segmentWidth > 0) {
+        let nx = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
+        if (nx > 0) nx -= segmentWidth; // normalize to [-w, 0)
+        targetX = nx;
+      }
+      setTrackX(targetX);
+      return;
+    }
+
+    // Mobile: clamp within content bounds (no wrap)
+    const totalWidth = track.scrollWidth;
+    const minX = Math.min(0, viewportWidth - totalWidth); // negative or 0
+    const maxX = 0;
+    const clamped = Math.max(minX, Math.min(maxX, targetX));
+    setTrackX(clamped);
+  }, [isMobile]);
+
   // Use custom touch gestures hook
   const { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping } = useTouchGestures(
     () => {
       // Swipe left - go to next
       const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
       onLinkChange(newIndex);
+      // Center after selection change
+      scrollToCenterItem(newIndex);
     },
     () => {
       // Swipe right - go to previous
       const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
       onLinkChange(newIndex);
+      // Center after selection change
+      scrollToCenterItem(newIndex);
     }
   );
 
@@ -320,44 +364,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     window.open(currentLink.url, '_blank');
   };
 
-  // Helper function for auto-scrolling to center selected item
-  const scrollToCenterItem = React.useCallback((index: number) => {
-    if (isMobile) return; // Only auto-scroll on desktop
-    
-    setTimeout(() => {
-      const viewport = viewportRef.current;
-      const track = trackRef.current;
-      if (viewport && track) {
-        const viewportRect = viewport.getBoundingClientRect();
-        const viewportWidth = viewportRect.width;
-        
-        // Get the actual item dimensions from the DOM
-        const firstItem = track.children[0] as HTMLElement;
-        if (firstItem) {
-          const itemRect = firstItem.getBoundingClientRect();
-          const itemWidth = itemRect.width;
-          const style = window.getComputedStyle(track);
-          const gap = parseFloat(style.columnGap || style.gap || '0') || 12;
-          
-          // Calculate the target position to perfectly center the item
-          const targetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
-          
-          // For infinite scroll, we need to handle wrapping properly
-          const segmentWidth = segmentWidthRef.current;
-          let finalTargetX = targetX;
-          
-          if (segmentWidth > 0) {
-            // Normalize to the infinite scroll range
-            finalTargetX = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
-            if (finalTargetX > 0) finalTargetX -= segmentWidth;
-          }
-          
-          // Smooth scroll to the target position
-          setTrackX(finalTargetX);
-        }
-      }
-    }, 50); // Reduced delay for better responsiveness
-  }, [isMobile]);
+  // Keep desktop arrow/click navigation centering
 
   const scrollLeftIndex = React.useCallback(() => {
     const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
