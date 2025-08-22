@@ -34,7 +34,8 @@ const CurrentTrack = styled.div`
 
   /* Mobile optimizations */
   @media (max-width: 768px) {
-    margin-bottom: 0.75rem;
+    margin-bottom: 1.25rem; /* More space between thumbnail and carousel */
+    min-height: 220px; /* Ensure enough vertical space for title/link area */
   }
 `;
 
@@ -53,8 +54,9 @@ const TrackTitle = styled.h3`
   /* Mobile font scaling */
   @media (max-width: 768px) {
     font-size: clamp(1rem, 4vw, 1.25rem);
-    line-height: 1.3;
-    margin: 0 0 0.3rem 0;
+    line-height: 1.4;
+    margin: 0 0 0.5rem 0; /* More space below title */
+    min-height: 2.8em; /* Ensure space for 2 lines if needed */
   }
 `;
 
@@ -79,7 +81,7 @@ const PlaylistSection = styled.div`
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin-top: 0.5rem;
+    margin-top: 0.75rem; /* More space above carousel */
     margin-bottom: 0;
   }
 `;
