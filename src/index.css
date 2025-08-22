@@ -114,6 +114,17 @@ code {
     -webkit-touch-callout: none;
     -webkit-tap-highlight-color: transparent;
     touch-action: none; /* Disable all touch gestures except what we need */
+    /* Additional iOS Safari scroll blocking */
+    -webkit-overflow-scrolling: auto; /* Disable momentum scrolling */
+    overscroll-behavior: none; /* Prevent overscroll */
+    scroll-behavior: auto; /* Disable smooth scrolling */
+    /* Force viewport constraints */
+    min-height: 100vh;
+    max-height: 100vh;
+    /* Prevent any form of scrolling */
+    -webkit-scrollbar: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
   }
   
   /* Allow touch only on carousel */
