@@ -89,14 +89,14 @@ async function copyThumbnails() {
       fs.copyFileSync(src, dst);
       console.log(`✅ Copied: ${item.localImage}`);
 
-      metadata.push({
-        title: item.title,
-        description: item.description || '',
-        image: `/kenna/assets/thumbnails/${item.localImage}`,
-        url: item.url,
-        domain: item.domain,
-        localImage: item.localImage
-      });
+              metadata.push({
+          title: item.title,
+          description: item.description || '',
+          image: `/alphonse_f/assets/thumbnails/${item.localImage}`,
+          url: item.url,
+          domain: item.domain,
+          localImage: item.localImage
+        });
     }
   }
 
