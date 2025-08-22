@@ -217,7 +217,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   const segmentWidthRef = React.useRef<number>(0);
 
   // Use custom touch gestures hook
-  const { onTouchStart, onTouchMove, onTouchEnd } = useTouchGestures(
+  const { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping } = useTouchGestures(
     () => {
       // Swipe left - go to next
       const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
@@ -476,8 +476,9 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
+          onTouchCancel={onTouchCancel}
         >
-          <TrackRow ref={trackRef} style={{ transform: `translate3d(${trackX}px, 0, 0)` }}>
+          <TrackRow ref={trackRef} style={{ transform: `translate3d(${trackX}px, 0, 0)`, transition: isSwiping ? 'none' : undefined }}>
             {renderThumbnails()}
           </TrackRow>
           <OverlayLayer>
@@ -490,7 +491,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           </OverlayLayer>
           {isMobile && (
             <SwipeIndicator>
-              ← swipe to navigate →
+              {isSwiping ? 'Swipe to navigate' : '← swipe to navigate →'}
             </SwipeIndicator>
           )}
         </Viewport>

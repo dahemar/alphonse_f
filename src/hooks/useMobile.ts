@@ -88,48 +88,66 @@ export const useLazyLoading = (isMobile: boolean, items: any[], bufferSize: numb
 
 // Hook for touch gesture detection
 export const useTouchGestures = (onSwipeLeft?: () => void, onSwipeRight?: () => void) => {
-  const [touchStart, setTouchStart] = useState<{ x: number; y: number } | null>(null);
-  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number } | null>(null);
+  const [touchStart, setTouchStart] = useState<{ x: number; y: number; timestamp: number } | null>(null);
+  const [touchEnd, setTouchEnd] = useState<{ x: number; y: number; timestamp: number } | null>(null);
+  const [isSwiping, setIsSwiping] = useState(false);
 
-  const minSwipeDistance = 50;
+  const minSwipeDistance = 25; // px
+  const maxSwipeTime = 500; // ms
+  const minSwipeVelocity = 0.3; // px/ms
 
   const onTouchStart = (e: React.TouchEvent) => {
+    if (e.targetTouches.length !== 1) return;
+    const t = e.targetTouches[0];
     setTouchEnd(null);
-    setTouchStart({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
-    });
+    setIsSwiping(false);
+    setTouchStart({ x: t.clientX, y: t.clientY, timestamp: Date.now() });
   };
 
   const onTouchMove = (e: React.TouchEvent) => {
-    setTouchEnd({
-      x: e.targetTouches[0].clientX,
-      y: e.targetTouches[0].clientY,
-    });
+    if (e.targetTouches.length !== 1) return;
+    const t = e.targetTouches[0];
+    setTouchEnd({ x: t.clientX, y: t.clientY, timestamp: Date.now() });
+
+    if (touchStart && !isSwiping) {
+      const dx = Math.abs(t.clientX - touchStart.x);
+      const dy = Math.abs(t.clientY - touchStart.y);
+      if (dx > 10 && dx > dy) {
+        setIsSwiping(true);
+      }
+    }
   };
 
   const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    
+    if (!touchStart || !touchEnd) {
+      setIsSwiping(false);
+      return;
+    }
+    const now = Date.now();
+    const timeElapsed = now - touchStart.timestamp;
     const distanceX = touchStart.x - touchEnd.x;
     const distanceY = touchStart.y - touchEnd.y;
+    const velocityX = Math.abs(distanceX) / Math.max(1, timeElapsed);
     const isHorizontalSwipe = Math.abs(distanceX) > Math.abs(distanceY);
-    
-    if (isHorizontalSwipe && Math.abs(distanceX) > minSwipeDistance) {
-      if (distanceX > 0 && onSwipeLeft) {
-        onSwipeLeft();
-      } else if (distanceX < 0 && onSwipeRight) {
-        onSwipeRight();
-      }
+    const hasMinDistance = Math.abs(distanceX) > minSwipeDistance;
+    const hasMinVelocity = velocityX > minSwipeVelocity;
+    const isQuickGesture = timeElapsed < maxSwipeTime;
+
+    if (isHorizontalSwipe && hasMinDistance && (hasMinVelocity || isQuickGesture) && isSwiping) {
+      if (distanceX > 0 && onSwipeLeft) onSwipeLeft();
+      else if (distanceX < 0 && onSwipeRight) onSwipeRight();
     }
-    
+
     setTouchStart(null);
     setTouchEnd(null);
+    setIsSwiping(false);
   };
 
-  return {
-    onTouchStart,
-    onTouchMove,
-    onTouchEnd,
+  const onTouchCancel = () => {
+    setTouchStart(null);
+    setTouchEnd(null);
+    setIsSwiping(false);
   };
+
+  return { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping };
 };
