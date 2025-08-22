@@ -35,7 +35,6 @@ code {
     overflow-y: hidden; /* Disable vertical scroll */
     width: 100%;
     max-width: 100%;
-    position: fixed; /* Fix the page in place */
     height: 100vh;
   }
   
