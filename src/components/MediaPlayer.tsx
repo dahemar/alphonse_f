@@ -180,9 +180,12 @@ const TrackItem = styled.div`
   flex: 0 0 auto;
   scroll-snap-align: start;
 
-  /* Mobile touch-friendly sizing */
+  /* Mobile: force exactly 3 thumbnails to fit viewport width */
   @media (max-width: 768px) {
-    min-width: 120px; /* Larger touch target */
+    /* Two gaps of 0.6rem inside the viewport */
+    flex: 0 0 calc((100vw - 1.2rem) / 3);
+    max-width: calc((100vw - 1.2rem) / 3);
+    min-width: calc((100vw - 1.2rem) / 3);
   }
 `;
 
@@ -233,8 +236,16 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     const firstChild = track.children[0] as HTMLElement | undefined;
     const itemWidth = firstChild ? firstChild.getBoundingClientRect().width : 120;
 
-    // Desired target position to center the selected index
-    let targetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
+    // Desired target position:
+    // - Desktop: center in viewport
+    // - Mobile: place selected item in the SECOND slot (middle of three)
+    let targetX = -(index * (itemWidth + gap));
+    if (isMobile) {
+      const secondSlotOffset = (itemWidth + gap); // leave exactly one item + gap at the left
+      targetX += secondSlotOffset;
+    } else {
+      targetX += (viewportWidth / 2) - (itemWidth / 2);
+    }
 
     if (!isMobile) {
       // Desktop: apply wrapping within the duplicated track for infinite scroll
@@ -358,6 +369,9 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
 
   const handlePlaylistClick = (index: number) => {
     onLinkChange(index);
+    if (isMobile) {
+      scrollToCenterItem(index);
+    }
   };
 
   const handleCurrentTrackClick = () => {
@@ -396,6 +410,11 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [scrollLeftIndex, scrollRightIndex]);
+
+  // Keep centered when currentIndex changes externally
+  React.useEffect(() => {
+    scrollToCenterItem(currentIndex);
+  }, [currentIndex, scrollToCenterItem]);
 
   // Render only visible thumbnails on mobile for performance
   const renderThumbnails = () => {
