@@ -1,0 +1,96 @@
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
+
+const Wrap = styled.div`
+  margin: 1.25rem 0 1.5rem 0;
+  color: var(--fg); /* match main text color per mode */
+  user-select: none;
+  pointer-events: none;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow: hidden;
+
+  /* Mobile spacing */
+  @media (max-width: 768px) {
+    margin: 1.5rem 0 2rem 0;
+  }
+`;
+
+const Row = styled.div`
+  overflow: hidden;
+  width: 100%;
+`;
+
+const BaseText = styled.div`
+  display: inline-block;
+  white-space: nowrap;
+  font-family: 'IBM Plex Mono', 'JetBrains Mono', 'SFMono-Regular', ui-monospace, monospace;
+  font-size: 12px;
+  line-height: 1;
+
+  /* Mobile font scaling */
+  @media (max-width: 768px) {
+    font-size: 10px;
+  }
+`;
+
+const scrollLoop = keyframes`
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+`;
+
+const Track = styled(BaseText)<{ $duration: number; $direction?: 'normal' | 'reverse'; $delay?: number }>`
+  will-change: transform;
+  animation: ${scrollLoop} ${p => p.$duration}s linear infinite;
+  animation-direction: ${p => p.$direction || 'normal'};
+  animation-delay: ${p => (p.$delay || 0)}s;
+
+  /* Mobile performance optimizations */
+  @media (max-width: 768px) {
+    /* Reduce animation complexity on mobile for better performance */
+    animation-duration: ${p => p.$duration * 0.8}s;
+    
+    /* Disable animations on low-end devices */
+    @media (prefers-reduced-motion: reduce) {
+      animation: none;
+    }
+  }
+`;
+
+interface OrnamentalDividerProps {
+  mode?: 'evil' | 'angel' | 'regular';
+}
+
+const OrnamentalDivider: React.FC<OrnamentalDividerProps> = ({ mode = 'evil' }) => {
+  // Extended groupings
+  const topSeg = '╔══════════════╦═══════════════════╦══════════════╗   ';
+  const midSeg = '✧ ✦ ✪ ✫ ✬ ✭ ✮ ✯ ✰ ✱ ✲ ✳ ✴ ✵ ✶ ✷ ✸ ✹ ✺ ✻ ✼ ✽ ✾ ❀ ❁ ❂ ❃ ❄ ❅ ❆ ❇   ';
+  const botSeg = '╚══════════════╩═══════════════════╩══════════════╝   ';
+
+  const top = topSeg.repeat(60);
+  const mid = midSeg.repeat(60);
+  const bot = botSeg.repeat(60);
+
+  // Two concatenated copies for seamless loop; the -50% shift hides the reset
+  const dup = (s: string) => s + s;
+
+  // In regular mode, make ornament invisible by matching background color
+  const isRegular = mode === 'regular';
+  
+  return (
+    <Wrap aria-hidden style={{ color: isRegular ? 'var(--bg)' : undefined }}>
+      <Row>
+        <Track $duration={240}>{dup(top)}</Track>
+      </Row>
+      <Row>
+        <Track $duration={180} $direction="reverse">{dup(mid)}</Track>
+      </Row>
+      <Row>
+        <Track $duration={300}>{dup(bot)}</Track>
+      </Row>
+    </Wrap>
+  );
+};
+
+export default OrnamentalDivider;

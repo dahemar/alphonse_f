@@ -1,46 +1,68 @@
-# Getting Started with Create React App
+# Portfolio Portfolio
+Un portfolio web moderno construido con React y TypeScript que presenta un reproductor de media player estético para mostrar links.
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Características
 
-## Available Scripts
+- **Diseño Responsivo**: Interfaz moderna con gradientes y efectos de glassmorphism
+- **Reproductor Estético**: Diseño de media player que muestra links en lugar de canciones
+- **Lista de Links**: Playlist scrolleable con thumbnails y navegación
+- **Navegación Intuitiva**: Botones de navegación y selección directa de links
+- **Thumbnails Personalizados**: Imágenes representativas para cada link
 
-In the project directory, you can run:
+## Links Incluidos
 
-### `npm start`
+El portfolio incluye una colección de artículos y entrevistas de diferentes medios:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Palmistry Tinkerbell Interview (Paper Magazine)
+- BKTHERULA Lvl5 (Paper Magazine)
+- Joanne Robertson Blue Car (Paper Magazine)
+- Joanne Robertson on Creating Alone (The Creative Independent)
+- Julia's War Recordings (Nina Protocol)
+- Building Intensity: Ouri (Office Magazine)
+- Sean Kennedy Olth Interview (Alternative Press)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Tecnologías Utilizadas
 
-### `npm test`
+- React 18
+- TypeScript
+- Styled Components
+- CSS3 con efectos modernos
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## Instalación y Ejecución
 
-### `npm run build`
+1. Instalar dependencias:
+```bash
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+2. Ejecutar en modo desarrollo:
+```bash
+npm start
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+3. Construir para producción:
+```bash
+npm run build
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Estructura del Proyecto
 
-### `npm run eject`
+```
+src/
+├── components/
+│   ├── Bio.tsx          # Componente de biografía
+│   └── MediaPlayer.tsx  # Reproductor de media player
+├── App.tsx              # Componente principal
+└── index.tsx            # Punto de entrada
+```
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+## Personalización
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Bio**: Edita el texto en `src/components/Bio.tsx`
+- **Links**: Modifica la lista en `src/App.tsx`
+- **Estilos**: Personaliza los componentes styled en cada archivo
+- **Thumbnails**: Reemplaza los placeholders con imágenes reales
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## Licencia
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+MIT
