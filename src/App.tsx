@@ -53,7 +53,7 @@ const ModeSwitcher = styled.div`
 
   /* Mobile positioning and sizing */
   @media (max-width: 768px) {
-    top: 8px;
+    top: calc(env(safe-area-inset-top) + 8px);
     right: 8px;
     gap: 6px;
   }

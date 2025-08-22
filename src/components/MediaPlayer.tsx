@@ -191,6 +191,7 @@ const ArrowButton = styled.button<{ $direction: 'left' | 'right' }>`
 const TrackItem = styled.div`
   flex: 0 0 auto;
   scroll-snap-align: center; /* Center alignment instead of start */
+  touch-action: pan-x; /* restrict gesture to horizontal */
 
   /* Mobile: force exactly 3 thumbnails to fit viewport width */
   @media (max-width: 768px) {
@@ -201,6 +202,7 @@ const TrackItem = styled.div`
     display: flex;
     justify-content: center; /* Center content within each item */
     align-items: center;
+    touch-action: pan-x; /* also on mobile */
   }
 `;
 
