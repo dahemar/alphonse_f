@@ -103,7 +103,7 @@ const Viewport = styled.div`
     height: 128px; /* slightly taller to avoid cropping bottom */
     max-width: 100%;
     width: 100%;
-    touch-action: pan-y pinch-zoom;
+    touch-action: pan-x; /* allow only horizontal panning */
     margin-bottom: 0;
     overflow-x: hidden;
   }
@@ -116,11 +116,13 @@ const TrackRow = styled.div`
   will-change: transform;
   transition: transform 0.2s ease-out; /* Smooth transition for auto-scroll */
   align-items: center; /* Center items vertically */
+  touch-action: pan-x; /* prefer horizontal gestures */
 
   /* Mobile gap adjustment */
   @media (max-width: 768px) {
     gap: 0.4rem;
     align-items: center;
+    touch-action: pan-x; /* restrict to horizontal on mobile */
   }
 `;
 

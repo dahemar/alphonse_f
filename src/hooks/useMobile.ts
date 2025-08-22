@@ -116,6 +116,16 @@ export const useTouchGestures = (onSwipeLeft?: () => void, onSwipeRight?: () => 
         setIsSwiping(true);
       }
     }
+
+    // Prevent vertical scrolling when interacting with thumbnails
+    // Allow only horizontal intent
+    if (touchStart) {
+      const dy = Math.abs(t.clientY - touchStart.y);
+      const dx = Math.abs(t.clientX - touchStart.x);
+      if (dx > dy) {
+        e.preventDefault();
+      }
+    }
   };
 
   const onTouchEnd = () => {
