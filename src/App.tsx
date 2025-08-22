@@ -185,7 +185,7 @@ const DesktopTitle = styled.h1`
 `;
 
 function App() {
-  const [currentLinkIndex, setCurrentLinkIndex] = useState(0);
+  const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
   const [mode, setMode] = useState<Mode>('regular');
 
   const links = [

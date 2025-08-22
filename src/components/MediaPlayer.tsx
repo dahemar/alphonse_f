@@ -83,6 +83,11 @@ const PlaylistSection = styled.div`
   @media (max-width: 768px) {
     margin-top: 0.75rem; /* More space above carousel */
     margin-bottom: 0;
+    position: fixed; /* Fixed position to prevent movement */
+    bottom: 0; /* Position at bottom of screen */
+    left: 0;
+    right: 0;
+    z-index: 10;
   }
 `;
 
