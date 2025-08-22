@@ -191,26 +191,33 @@ function App() {
   // Robust page scroll lock: vertical fixed at top, horizontal fixed at page center
   React.useEffect(() => {
     const computeLock = () => {
-      const doc = document.documentElement;
-      const body = document.body;
-      const pageWidth = Math.max(doc.scrollWidth, body.scrollWidth, doc.clientWidth);
+      const scrollEl = document.scrollingElement || document.documentElement;
       const vv = (window as any).visualViewport as VisualViewport | undefined;
       const viewportWidth = vv ? vv.width : window.innerWidth;
-      const viewportOffsetLeft = vv ? vv.offsetLeft : 0;
+      const pageLeft = vv ? (vv as any).pageLeft || 0 : 0;
+
+      const scrollWidth = Math.max(scrollEl.scrollWidth, scrollEl.clientWidth);
       const lockY = 0; // top of the page
-      // Center relative to visual viewport and subtract any visual offset (notch, dynamic inset)
-      const rawCenter = (pageWidth - viewportWidth) / 2;
-      const lockX = Math.max(0, Math.round(rawCenter - viewportOffsetLeft));
+
+      // Center relative to total scrollable width and adjust by visual viewport page offset
+      const rawCenter = (scrollWidth - viewportWidth) / 2;
+      let lockX = Math.round(rawCenter - pageLeft);
+
+      // Clamp to valid scrollable bounds
+      const maxX = Math.max(0, scrollWidth - viewportWidth);
+      if (lockX < 0) lockX = 0;
+      if (lockX > maxX) lockX = maxX;
+
       return { lockX, lockY };
     };
 
     let { lockX, lockY } = computeLock();
-    if (window.scrollX !== lockX || window.scrollY !== lockY) {
+    if (Math.abs(window.scrollX - lockX) > 0.5 || Math.abs(window.scrollY - lockY) > 0.5) {
       window.scrollTo(lockX, lockY);
     }
 
     const onScroll = () => {
-      if (window.scrollX !== lockX || window.scrollY !== lockY) {
+      if (Math.abs(window.scrollX - lockX) > 0.5 || Math.abs(window.scrollY - lockY) > 0.5) {
         window.scrollTo(lockX, lockY);
       }
     };
