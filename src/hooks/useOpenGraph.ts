@@ -28,7 +28,7 @@ const loadPreGeneratedData = async () => {
   try {
     // In production (GitHub Pages), this will be available
     if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
-      const response = await fetch('/kenna/thumbnail-data.json');
+      const response = await fetch('/alphonse_f/thumbnail-data.json');
       if (response.ok) {
         const data = await response.json();
         preGeneratedData = data;

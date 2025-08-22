@@ -203,7 +203,7 @@ function getHardcodedUrl(linkUrl: string): string | null {
   if (!filename) return null;
   const isGh = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
   if (isGh) {
-    return `/kenna/assets/fallback/${filename}`;
+    return `/alphonse_f/assets/fallback/${filename}`;
   }
   // Local dev served from Express
   return `http://localhost:4000/assets/fallback/${filename}`;
