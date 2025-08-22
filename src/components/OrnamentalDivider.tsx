@@ -51,11 +51,22 @@ const Track = styled(BaseText)<{ $duration: number; $direction?: 'normal' | 'rev
 
   /* Mobile performance optimizations */
   @media (max-width: 768px) {
-    /* Keep same animation speed as desktop */
+    /* Force animations to work on mobile */
+    will-change: transform;
+    transform: translateZ(0); /* Force hardware acceleration */
+    -webkit-transform: translateZ(0);
+    -webkit-animation: ${scrollLoop} ${p => p.$duration}s linear infinite;
+    -webkit-animation-direction: ${p => p.$direction || 'normal'};
+    -webkit-animation-delay: ${p => (p.$delay || 0)}s;
+    
+    /* Ensure animations are not disabled */
+    animation-play-state: running !important;
+    -webkit-animation-play-state: running !important;
     
     /* Disable animations on low-end devices */
     @media (prefers-reduced-motion: reduce) {
       animation: none;
+      -webkit-animation: none;
     }
   }
 `;
