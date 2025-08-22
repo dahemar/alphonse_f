@@ -236,35 +236,17 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     const firstChild = track.children[0] as HTMLElement | undefined;
     const itemWidth = firstChild ? firstChild.getBoundingClientRect().width : 120;
 
-    // Desired target position:
-    // - Desktop: center in viewport
-    // - Mobile: place selected item in the SECOND slot (middle of three)
-    let targetX = -(index * (itemWidth + gap));
-    if (isMobile) {
-      const secondSlotOffset = (itemWidth + gap); // leave exactly one item + gap at the left
-      targetX += secondSlotOffset;
-    } else {
-      targetX += (viewportWidth / 2) - (itemWidth / 2);
-    }
+    // Desired target position: center selected item in the viewport
+    let targetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
 
-    if (!isMobile) {
-      // Desktop: apply wrapping within the duplicated track for infinite scroll
-      const segmentWidth = segmentWidthRef.current;
-      if (segmentWidth > 0) {
-        let nx = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
-        if (nx > 0) nx -= segmentWidth; // normalize to [-w, 0)
-        targetX = nx;
-      }
-      setTrackX(targetX);
-      return;
+    // Apply wrapping for infinite effect (both desktop and mobile)
+    const segmentWidth = segmentWidthRef.current;
+    if (segmentWidth > 0) {
+      let nx = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
+      if (nx > 0) nx -= segmentWidth; // normalize to [-w, 0)
+      targetX = nx;
     }
-
-    // Mobile: clamp within content bounds (no wrap)
-    const totalWidth = track.scrollWidth;
-    const minX = Math.min(0, viewportWidth - totalWidth); // negative or 0
-    const maxX = 0;
-    const clamped = Math.max(minX, Math.min(maxX, targetX));
-    setTrackX(clamped);
+    setTrackX(targetX);
   }, [isMobile]);
 
   // Use custom touch gestures hook
@@ -418,61 +400,37 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
 
   // Render only visible thumbnails on mobile for performance
   const renderThumbnails = () => {
-    if (!isMobile) {
-      // Desktop: render all thumbnails twice for infinite scroll
-      return (
-        <>
-          {links.map((link, index) => (
-            <TrackItem key={`seg1-${index}`} className={`track-item-${index}`}>
-              <OpenGraphThumbnail
-                url={link.url}
-                fallbackTitle={link.title}
-                fallbackDomain={link.domain}
-                $isActive={index === currentIndex}
-                onClick={() => handlePlaylistClick(index)}
-                $size="small"
-                $showInfo={true} // Show info in carousel
-              />
-            </TrackItem>
-          ))}
-          {links.map((link, index) => (
-            <TrackItem key={`seg2-${index}`} className={`track-item-${index}`}>
-              <OpenGraphThumbnail
-                url={link.url}
-                fallbackTitle={link.title}
-                fallbackDomain={link.domain}
-                $isActive={index === currentIndex}
-                onClick={() => handlePlaylistClick(index)}
-                $size="small"
-                $showInfo={true} // Show info in carousel
-              />
-            </TrackItem>
-          ))}
-        </>
-      );
-    }
-
-    // Mobile: render only visible range + buffer for better performance
-    const buffer = 2;
-    const start = Math.max(0, Math.floor(-trackX / 120) - buffer);
-    const end = Math.min(links.length - 1, Math.ceil((-trackX + (viewportRef.current?.getBoundingClientRect().width || 0)) / 120) + buffer);
-    
-    return links.slice(start, end + 1).map((link, arrayIndex) => {
-      const actualIndex = start + arrayIndex;
-      return (
-        <TrackItem key={`mobile-${actualIndex}`} className={`track-item-${actualIndex}`}>
-          <OpenGraphThumbnail
-            url={link.url}
-            fallbackTitle={link.title}
-            fallbackDomain={link.domain}
-            $isActive={actualIndex === currentIndex}
-            onClick={() => handlePlaylistClick(actualIndex)}
-            $size="small"
-            $showInfo={false} // Don't show info in carousel to avoid duplication
-          />
-        </TrackItem>
-      );
-    });
+    // Render two segments on all devices for consistent infinite loop behavior
+    return (
+      <>
+        {links.map((link, index) => (
+          <TrackItem key={`seg1-${index}`} className={`track-item-${index}`}>
+            <OpenGraphThumbnail
+              url={link.url}
+              fallbackTitle={link.title}
+              fallbackDomain={link.domain}
+              $isActive={index === currentIndex}
+              onClick={() => handlePlaylistClick(index)}
+              $size="small"
+              $showInfo={!isMobile}
+            />
+          </TrackItem>
+        ))}
+        {links.map((link, index) => (
+          <TrackItem key={`seg2-${index}`} className={`track-item-${index}`}>
+            <OpenGraphThumbnail
+              url={link.url}
+              fallbackTitle={link.title}
+              fallbackDomain={link.domain}
+              $isActive={index === currentIndex}
+              onClick={() => handlePlaylistClick(index)}
+              $size="small"
+              $showInfo={!isMobile}
+            />
+          </TrackItem>
+        ))}
+      </>
+    );
   };
 
   return (
