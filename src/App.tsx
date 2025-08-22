@@ -192,10 +192,15 @@ function App() {
   React.useEffect(() => {
     const computeLock = () => {
       const doc = document.documentElement;
-      const pageWidth = doc.scrollWidth;
-      const viewportWidth = window.innerWidth;
+      const body = document.body;
+      const pageWidth = Math.max(doc.scrollWidth, body.scrollWidth, doc.clientWidth);
+      const vv = (window as any).visualViewport as VisualViewport | undefined;
+      const viewportWidth = vv ? vv.width : window.innerWidth;
+      const viewportOffsetLeft = vv ? vv.offsetLeft : 0;
       const lockY = 0; // top of the page
-      const lockX = Math.max(0, Math.round((pageWidth - viewportWidth) / 2));
+      // Center relative to visual viewport and subtract any visual offset (notch, dynamic inset)
+      const rawCenter = (pageWidth - viewportWidth) / 2;
+      const lockX = Math.max(0, Math.round(rawCenter - viewportOffsetLeft));
       return { lockX, lockY };
     };
 
@@ -205,32 +210,29 @@ function App() {
     }
 
     const onScroll = () => {
-      // Re-pin to locked coordinates
       if (window.scrollX !== lockX || window.scrollY !== lockY) {
         window.scrollTo(lockX, lockY);
       }
     };
 
-    const preventScrollDefault = (e: Event) => {
-      // Prevent browser scrolling while allowing gesture events to bubble to React handlers
-      const target = e.target as Element | null;
-      if (target && target.closest && target.closest('.carousel-touch-area')) {
-        // We still want to block page scroll even inside carousel
-        e.preventDefault();
-        return;
-      }
-      e.preventDefault();
-    };
-
-    const onResize = () => {
+    const recalc = () => {
       const v = computeLock();
       lockX = v.lockX;
       lockY = v.lockY;
       window.scrollTo(lockX, lockY);
     };
 
+    const preventScrollDefault = (e: Event) => {
+      e.preventDefault();
+    };
+
     window.addEventListener('scroll', onScroll, { passive: false } as any);
-    window.addEventListener('resize', onResize);
+    window.addEventListener('resize', recalc);
+    if ((window as any).visualViewport) {
+      const vv = (window as any).visualViewport as VisualViewport;
+      vv.addEventListener('resize', recalc);
+      vv.addEventListener('scroll', recalc);
+    }
     document.addEventListener('wheel', preventScrollDefault, { passive: false });
     document.addEventListener('touchmove', preventScrollDefault, { passive: false });
     document.addEventListener('gesturestart', preventScrollDefault as any, { passive: false } as any);
@@ -241,7 +243,12 @@ function App() {
 
     return () => {
       window.removeEventListener('scroll', onScroll as any);
-      window.removeEventListener('resize', onResize);
+      window.removeEventListener('resize', recalc);
+      if ((window as any).visualViewport) {
+        const vv = (window as any).visualViewport as VisualViewport;
+        vv.removeEventListener('resize', recalc);
+        vv.removeEventListener('scroll', recalc);
+      }
       document.removeEventListener('wheel', preventScrollDefault as any);
       document.removeEventListener('touchmove', preventScrollDefault as any);
       document.removeEventListener('gesturestart', preventScrollDefault as any);
