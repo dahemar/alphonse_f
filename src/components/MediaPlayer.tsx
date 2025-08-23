@@ -220,7 +220,18 @@ const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
   mix-blend-mode: difference; /* invert against whatever is behind */
   font-weight: 500;
   text-shadow: none;
-  transition: opacity 0.3s ease-in-out;
+  transition: opacity 0.8s ease-in-out;
+
+  /* Slow blinking animation when visible */
+  @keyframes slowBlink {
+    0%, 100% { opacity: 0.9; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Apply blinking animation only when visible */
+  ${props => props.$isVisible && `
+    animation: slowBlink 3s ease-in-out infinite;
+  `}
 
   @media (max-width: 768px) {
     display: block;
