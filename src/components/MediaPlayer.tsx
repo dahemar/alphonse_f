@@ -303,6 +303,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
 
   // Handle scroll state for swipe indicator visibility
   const handleScrollStart = React.useCallback(() => {
+    // Force immediate visibility change
     setIsScrolling(true);
     // Clear existing timeout
     if (scrollTimeoutRef.current) {
@@ -322,15 +323,11 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
 
   // Enhanced touch handlers that manage scroll state
   const handleTouchStart = React.useCallback((e: React.TouchEvent) => {
-    // Force immediate visibility change
-    setIsScrolling(true);
     handleScrollStart();
     onTouchStart(e);
   }, [handleScrollStart, onTouchStart]);
 
   const handleTouchMove = React.useCallback((e: React.TouchEvent) => {
-    // Ensure scrolling state is set during movement
-    setIsScrolling(true);
     handleScrollStart();
     onTouchMove(e);
   }, [handleScrollStart, onTouchMove]);
