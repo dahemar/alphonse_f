@@ -228,9 +228,10 @@ const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
     50% { opacity: 0.3; }
   }
 
-  /* Apply blinking animation only when visible */
+  /* Apply blinking animation only when visible, with delay to avoid conflict */
   ${props => props.$isVisible && `
     animation: slowBlink 3s ease-in-out infinite;
+    animation-delay: 1.5s; /* Start blinking after transition completes */
   `}
 
   @media (max-width: 768px) {
