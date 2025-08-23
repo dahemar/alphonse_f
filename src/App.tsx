@@ -161,8 +161,23 @@ const TitleAccent = styled.span`
   }
 `;
 
+const InvisibleAccent = styled.span`
+  color: var(--bg); /* Same color as background - invisible */
+  font-size: 1.6em; /* Same size as TitleAccent */
+  line-height: 0.9;
+  display: inline-block;
+  user-select: none; /* Cannot be selected */
+  pointer-events: none; /* Cannot be interacted with */
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    font-size: 1.4em;
+    line-height: 1;
+  }
+`;
+
 // Mobile-specific title without 's'
-const MobileTitle = styled.h1<{ $mode: Mode }>`
+const MobileTitle = styled.h1`
   display: none;
   margin: 0 0 0.6rem 0;
   font-size: clamp(2rem, 8vw, 2.6rem);
@@ -170,27 +185,17 @@ const MobileTitle = styled.h1<{ $mode: Mode }>`
   line-height: 1.1;
   color: var(--fg);
 
-  /* Adjust top margin when in regular mode to align with other modes */
-  ${props => props.$mode === 'regular' && `
-    margin-top: 0.2rem; /* Compensate for different line-height in other modes */
-  `}
-
   @media (max-width: 768px) {
     display: block;
   }
 `;
 
-const DesktopTitle = styled.h1<{ $mode: Mode }>`
+const DesktopTitle = styled.h1`
   margin: 0 0 1rem 0;
   font-size: 2.6rem;
   font-weight: 700;
   line-height: 1;
   color: var(--fg);
-
-  /* Adjust top margin when in regular mode to align with other modes */
-  ${props => props.$mode === 'regular' && `
-    margin-top: 0.3rem; /* Compensate for different line-height in other modes */
-  `}
 
   @media (max-width: 768px) {
     display: none;
@@ -316,11 +321,11 @@ function App() {
         <ModeOption title="regular" aria-label="regular" $active={mode === 'regular'} onClick={() => setMode('regular')}>regular</ModeOption>
       </ModeSwitcher>
       <ContentWrapper>
-        <DesktopTitle $mode={mode}>
-          {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
+        <DesktopTitle>
+          {mode === 'regular' ? <>kenna mccafferty<InvisibleAccent>f</InvisibleAccent></> : <>alphonse <TitleAccent>f</TitleAccent></>}
         </DesktopTitle>
-        <MobileTitle $mode={mode}>
-          {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
+        <MobileTitle>
+          {mode === 'regular' ? <>kenna mccafferty<InvisibleAccent>f</InvisibleAccent></> : <>alphonse <TitleAccent>f</TitleAccent></>}
         </MobileTitle>
         
         {isReady && (
