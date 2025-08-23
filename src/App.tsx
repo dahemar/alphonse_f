@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import styled from 'styled-components';
 import contentManager from './utils/ContentManager';
 
@@ -162,7 +162,7 @@ const TitleAccent = styled.span`
 `;
 
 // Mobile-specific title without 's'
-const MobileTitle = styled.h1`
+const MobileTitle = styled.h1<{ $mode: Mode }>`
   display: none;
   margin: 0 0 0.6rem 0;
   font-size: clamp(2rem, 8vw, 2.6rem);
@@ -170,17 +170,27 @@ const MobileTitle = styled.h1`
   line-height: 1.1;
   color: var(--fg);
 
+  /* Adjust top margin when in regular mode to align with other modes */
+  ${props => props.$mode === 'regular' && `
+    margin-top: 0.2rem; /* Compensate for different line-height in other modes */
+  `}
+
   @media (max-width: 768px) {
     display: block;
   }
 `;
 
-const DesktopTitle = styled.h1`
+const DesktopTitle = styled.h1<{ $mode: Mode }>`
   margin: 0 0 1rem 0;
   font-size: 2.6rem;
   font-weight: 700;
   line-height: 1;
   color: var(--fg);
+
+  /* Adjust top margin when in regular mode to align with other modes */
+  ${props => props.$mode === 'regular' && `
+    margin-top: 0.3rem; /* Compensate for different line-height in other modes */
+  `}
 
   @media (max-width: 768px) {
     display: none;
@@ -220,17 +230,6 @@ function App() {
   const handleLinkChange = useCallback((index: number) => {
     setCurrentLinkIndex(index);
   }, []);
-
-  const handleModeChange = useCallback((newMode: Mode) => {
-    setMode(newMode);
-  }, []);
-
-  // Memoize computed values
-  const currentLink = useMemo(() => {
-    return links[currentLinkIndex] || null;
-  }, [links, currentLinkIndex]);
-
-  const shouldInvertScroll = useMemo(() => mode === 'evil', [mode]);
 
   // Robust page scroll lock: vertical fixed at top, horizontal fixed at page center
   React.useEffect(() => {
@@ -317,10 +316,10 @@ function App() {
         <ModeOption title="regular" aria-label="regular" $active={mode === 'regular'} onClick={() => setMode('regular')}>regular</ModeOption>
       </ModeSwitcher>
       <ContentWrapper>
-        <DesktopTitle>
+        <DesktopTitle $mode={mode}>
           {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
         </DesktopTitle>
-        <MobileTitle>
+        <MobileTitle $mode={mode}>
           {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
         </MobileTitle>
         
