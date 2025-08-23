@@ -321,10 +321,10 @@ function App() {
       </ModeSwitcher>
       <ContentWrapper>
         <DesktopTitle>
-          alphonse <TitleAccent>f</TitleAccent>
+          {mode === 'regular' ? 'kenna mccafferty' : 'alphonse f'}
         </DesktopTitle>
         <MobileTitle>
-          alphonse <TitleAccent>f</TitleAccent>
+          {mode === 'regular' ? 'kenna mccafferty' : 'alphonse f'}
         </MobileTitle>
         <Bio />
       </ContentWrapper>
