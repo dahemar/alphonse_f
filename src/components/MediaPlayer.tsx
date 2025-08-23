@@ -207,22 +207,20 @@ const TrackItem = styled.div`
 `;
 
 // Mobile-specific swipe indicator
-const SwipeIndicator = styled.div`
-  display: none;
+const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white; /* Base color, mix-blend-mode will invert it */
+  color: white; /* use white and invert against backdrop */
   font-size: 1rem; /* Increased from 0.8rem */
-  opacity: 0.9;
+  opacity: ${props => props.$isVisible ? 0.9 : 0};
   pointer-events: none;
   z-index: 15;
-  mix-blend-mode: difference; /* Automatically invert colors based on background */
+  mix-blend-mode: difference; /* invert against whatever is behind */
   font-weight: 500;
   text-shadow: none;
-  /* Ensure it blends with page background, not just thumbnail */
-  isolation: isolate;
+  transition: opacity 0.3s ease-in-out;
 
   @media (max-width: 768px) {
     display: block;
@@ -239,7 +237,9 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   const velocityRef = React.useRef<number>(0);
   const lastTsRef = React.useRef<number>(0);
   const [trackX, setTrackX] = React.useState(0);
+  const [isScrolling, setIsScrolling] = React.useState(false);
   const segmentWidthRef = React.useRef<number>(0);
+  const scrollTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
 
   // Helper function for auto-scrolling to center selected item (mobile + desktop)
   const scrollToCenterItem = React.useCallback((index: number) => {
@@ -288,6 +288,46 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
       scrollToCenterItem(newIndex);
     }
   );
+
+  // Handle scroll state for swipe indicator visibility
+  const handleScrollStart = React.useCallback(() => {
+    setIsScrolling(true);
+    // Clear existing timeout
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+  }, []);
+
+  const handleScrollEnd = React.useCallback(() => {
+    // Show indicator again after a short delay
+    if (scrollTimeoutRef.current) {
+      clearTimeout(scrollTimeoutRef.current);
+    }
+    scrollTimeoutRef.current = setTimeout(() => {
+      setIsScrolling(false);
+    }, 1000); // 1 second delay
+  }, []);
+
+  // Enhanced touch handlers that manage scroll state
+  const handleTouchStart = React.useCallback((e: React.TouchEvent) => {
+    handleScrollStart();
+    onTouchStart(e);
+  }, [handleScrollStart, onTouchStart]);
+
+  const handleTouchMove = React.useCallback((e: React.TouchEvent) => {
+    handleScrollStart();
+    onTouchMove(e);
+  }, [handleScrollStart, onTouchMove]);
+
+  const handleTouchEnd = React.useCallback((e: React.TouchEvent) => {
+    onTouchEnd();
+    handleScrollEnd();
+  }, [onTouchEnd, handleScrollEnd]);
+
+  const handleTouchCancel = React.useCallback((e: React.TouchEvent) => {
+    onTouchCancel();
+    handleScrollEnd();
+  }, [onTouchCancel, handleScrollEnd]);
 
   const measure = React.useCallback(() => {
     const tr = trackRef.current;
@@ -368,7 +408,10 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   }, [invertScroll, isMobile, startRaf, stopRaf]);
 
   React.useEffect(() => {
-    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); };
+    return () => { 
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    };
   }, []);
 
   const handlePlaylistClick = (index: number) => {
@@ -480,10 +523,10 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           ref={viewportRef} 
           onMouseMove={handleMouseMove} 
           onMouseLeave={() => { velocityRef.current = 0; }}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-          onTouchCancel={onTouchCancel}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchCancel}
           className="carousel-touch-area"
         >
           <TrackRow ref={trackRef} style={{ transform: `translate3d(${trackX}px, 0, 0)`, transition: isSwiping ? 'none' : undefined }}>
@@ -497,11 +540,11 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
               <ArrowButton $direction="right">›</ArrowButton>
             </NavigationArrows>
           </OverlayLayer>
-          {isMobile && (
-            <SwipeIndicator>
-              {'← swipe to navigate →'}
-            </SwipeIndicator>
-          )}
+                      {isMobile && (
+              <SwipeIndicator $isVisible={!isScrolling}>
+                swipe to navigate
+              </SwipeIndicator>
+            )}
         </Viewport>
       </PlaylistSection>
     </PlayerContainer>
