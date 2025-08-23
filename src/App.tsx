@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense, lazy, useMemo, useCallback } from 'react';
 import styled from 'styled-components';
-import MediaPlayer from './components/MediaPlayer';
-import Bio from './components/Bio';
-import OrnamentalDivider from './components/OrnamentalDivider';
+import contentManager from './utils/ContentManager';
+
+// Lazy load heavy components
+const MediaPlayer = lazy(() => import('./components/MediaPlayer'));
+const Bio = lazy(() => import('./components/Bio'));
+const OrnamentalDivider = lazy(() => import('./components/OrnamentalDivider'));
 
 type Mode = 'evil' | 'angel' | 'regular';
 
@@ -145,6 +148,19 @@ const Help = styled(HelpBadge)`
   &:hover ${HelpTooltip} { opacity: 1; transform: translateY(0); border-color: var(--accent2); }
 `;
 
+const TitleAccent = styled.span`
+  color: var(--accent2);
+  font-size: 1.6em; /* oversize the f */
+  line-height: 0.9;
+  display: inline-block;
+
+  /* Mobile optimizations */
+  @media (max-width: 768px) {
+    font-size: 1.4em;
+    line-height: 1;
+  }
+`;
+
 // Mobile-specific title without 's'
 const MobileTitle = styled.h1`
   display: none;
@@ -174,6 +190,47 @@ const DesktopTitle = styled.h1`
 function App() {
   const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
   const [mode, setMode] = useState<Mode>('regular');
+  const [bio, setBio] = useState('');
+  const [links, setLinks] = useState<Array<{url: string; title: string; domain: string; thumbnail?: string}>>([]);
+  const [isReady, setIsReady] = useState(false);
+
+  // Load content from Google Sheets
+  useEffect(() => {
+    const loadContent = async () => {
+      try {
+        console.log('App: Starting to load content...');
+        const data = await contentManager.getData(); // Wait for data to be ready
+        console.log('App: Content loaded successfully:', data);
+        
+        if (data) {
+          setBio(data.bio);
+          setLinks(data.links);
+          setIsReady(true);
+        }
+      } catch (error) {
+        console.error('App: Failed to load content:', error);
+        // App will remain blank if loading fails
+      }
+    };
+
+    loadContent();
+  }, []);
+
+  // Memoize handlers to prevent unnecessary re-renders
+  const handleLinkChange = useCallback((index: number) => {
+    setCurrentLinkIndex(index);
+  }, []);
+
+  const handleModeChange = useCallback((newMode: Mode) => {
+    setMode(newMode);
+  }, []);
+
+  // Memoize computed values
+  const currentLink = useMemo(() => {
+    return links[currentLinkIndex] || null;
+  }, [links, currentLinkIndex]);
+
+  const shouldInvertScroll = useMemo(() => mode === 'evil', [mode]);
 
   // Robust page scroll lock: vertical fixed at top, horizontal fixed at page center
   React.useEffect(() => {
@@ -252,53 +309,6 @@ function App() {
     };
   }, []);
 
-  const links = [
-    {
-      url: 'https://www.papermag.com/palmistry-tinkerbell-interview',
-      title: 'Palmistry Tinkerbell Interview',
-      domain: 'papermag.com'
-    },
-    {
-      url: 'https://www.papermag.com/bktherula-lvl5',
-      title: 'BKTHERULA Lvl5',
-      domain: 'papermag.com'
-    },
-    {
-      url: 'https://www.papermag.com/joanne-robertson-blue-car',
-      title: 'Joanne Robertson Blue Car',
-      domain: 'papermag.com'
-    },
-    {
-      url: 'https://thecreativeindependent.com/people/painter-and-musician-joanne-robertson-on-why-its-never-just-you-creating-alone/',
-      title: 'Joanne Robertson on Creating Alone',
-      domain: 'thecreativeindependent.com'
-    },
-    {
-      url: 'https://www.ninaprotocol.com/articles/the-triumph-of-julias-war-recordings-the-indie-rock-antilabel-embracing-cassette-tapes-and-90s-rave-sounds',
-      title: 'Julia\'s War Recordings: The Indie Rock Antilabel',
-      domain: 'ninaprotocol.com'
-    },
-    {
-      url: 'https://officemagazine.net/building-intensity-ouri',
-      title: 'Building Intensity: Ouri',
-      domain: 'officemagazine.net'
-    },
-    {
-      url: 'https://www.altpress.com/sean-kennedy-olth-interview/',
-      title: 'Sean Kennedy Olth Interview',
-      domain: 'altpress.com'
-    },
-    {
-      url: 'https://www.are.na/editorial/the-future-will-be-like-perfume',
-      title: 'The Future Will Be Like Perfume',
-      domain: 'are.na'
-    }
-  ];
-
-  const handleLinkChange = (index: number) => {
-    setCurrentLinkIndex(index);
-  };
-
   return (
     <AppContainer $mode={mode}>
       <ModeSwitcher>
@@ -308,21 +318,32 @@ function App() {
       </ModeSwitcher>
       <ContentWrapper>
         <DesktopTitle>
-          {mode === 'regular' ? 'kenna mccafferty' : 'alphonse f'}
+          {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
         </DesktopTitle>
         <MobileTitle>
-          {mode === 'regular' ? 'kenna mccafferty' : 'alphonse f'}
+          {mode === 'regular' ? 'kenna mccafferty' : <>alphonse <TitleAccent>f</TitleAccent></>}
         </MobileTitle>
-        <Bio />
+        
+        {isReady && (
+          <Suspense fallback={null}>
+            <Bio text={bio} />
+          </Suspense>
+        )}
       </ContentWrapper>
-      <OrnamentalDivider mode={mode} />
+              <Suspense fallback={null}>
+          <OrnamentalDivider mode={mode} />
+        </Suspense>
       <ContentWrapper>
-        <MediaPlayer 
-          links={links}
-          currentIndex={currentLinkIndex}
-          onLinkChange={handleLinkChange}
-          invertScroll={mode === 'evil'}
-        />
+        {isReady && (
+          <Suspense fallback={null}>
+            <MediaPlayer 
+              links={links}
+              currentIndex={currentLinkIndex}
+              onLinkChange={handleLinkChange}
+              invertScroll={mode === 'evil'}
+            />
+          </Suspense>
+        )}
       </ContentWrapper>
               {mode !== 'regular' && (
           <Help>

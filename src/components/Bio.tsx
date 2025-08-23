@@ -1,6 +1,10 @@
 import React from 'react';
 import styled from 'styled-components';
 
+interface BioProps {
+  text: string;
+}
+
 const BioContainer = styled.div`
   margin-bottom: 4rem;
 
@@ -33,11 +37,11 @@ const BioText = styled.p`
   }
 `;
 
-const Bio: React.FC = () => {
+const Bio: React.FC<BioProps> = ({ text }) => {
   return (
     <BioContainer>
       <BioText>
-        I ask because I want to turn you over in the question
+        {text}
       </BioText>
     </BioContainer>
   );

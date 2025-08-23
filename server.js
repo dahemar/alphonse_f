@@ -293,6 +293,43 @@ app.get('/api/image', async (req, res) => {
   }
 });
 
+// Google Sheets API proxy to avoid CORS issues
+app.get('/api/sheets', async (req, res) => {
+  const { spreadsheetId, sheetName, apiKey } = req.query;
+  
+  if (!spreadsheetId || !sheetName || !apiKey) {
+    return res.status(400).json({ error: 'Missing required parameters' });
+  }
+
+  try {
+    console.log(`[SHEETS] Fetching sheet: ${sheetName} from ${spreadsheetId}`);
+    
+    const response = await axios.get(
+      `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}`,
+      {
+        params: { key: apiKey },
+        timeout: 10000
+      }
+    );
+
+    console.log(`[SHEETS] Successfully fetched ${sheetName}`);
+    res.json(response.data);
+    
+  } catch (error) {
+    console.error(`[SHEETS] Error fetching sheet:`, error.message);
+    
+    if (error.response) {
+      console.error(`[SHEETS] Response status: ${error.response.status}`);
+      console.error(`[SHEETS] Response data:`, error.response.data);
+    }
+    
+    res.status(500).json({ 
+      error: 'Failed to fetch Google Sheets data',
+      details: error.message 
+    });
+  }
+});
+
 app.listen(port, () => {
   console.log(`OG server running on http://localhost:${port}`);
 });
