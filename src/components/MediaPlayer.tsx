@@ -314,9 +314,9 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     }
     const style = window.getComputedStyle(tr);
     const gapPx = parseFloat((style as any).columnGap || (style as any).gap || '0') || 0;
-    // Include internal gaps and the seam gap between segment 1 and segment 2
+    // Include only internal gaps of the first segment (exclude the seam gap)
     total += gapPx * Math.max(0, count - 1);
-    segmentWidthRef.current = total + gapPx;
+    segmentWidthRef.current = total;
     // Align to 0 so wrapping uses range [-w, 0)
     setTrackX(0);
   }, []);
