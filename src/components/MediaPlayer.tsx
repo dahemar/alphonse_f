@@ -264,12 +264,25 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     // Apply wrapping for infinite effect (both desktop and mobile)
     const segmentWidth = segmentWidthRef.current;
     if (segmentWidth > 0) {
-      let nx = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
-      if (nx > 0) nx -= segmentWidth; // normalize to [-w, 0)
-      targetX = nx;
+      // Normalize base target to [-w, 0)
+      let base = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
+      if (base > 0) base -= segmentWidth;
+      // Choose the closest wrapped target to current X to avoid long jumps
+      const currentX = trackX;
+      const candidates = [base - segmentWidth, base, base + segmentWidth];
+      let best = candidates[0];
+      let bestDist = Math.abs(candidates[0] - currentX);
+      for (let i = 1; i < candidates.length; i += 1) {
+        const d = Math.abs(candidates[i] - currentX);
+        if (d < bestDist) {
+          best = candidates[i];
+          bestDist = d;
+        }
+      }
+      targetX = best;
     }
     setTrackX(targetX);
-  }, []);
+  }, [trackX]);
 
   // Use custom touch gestures hook
   const { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping } = useTouchGestures(
