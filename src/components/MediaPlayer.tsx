@@ -270,17 +270,26 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
     const firstChild = track.children[0] as HTMLElement | undefined;
     const itemWidth = firstChild ? firstChild.getBoundingClientRect().width : 120;
 
-    // Desired target position: center selected item in the viewport
-    let targetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
-
-    // Apply wrapping for infinite effect (both desktop and mobile)
-    const segmentWidth = segmentWidthRef.current;
-    if (segmentWidth > 0) {
-      let nx = ((targetX % segmentWidth) + segmentWidth) % segmentWidth;
-      if (nx > 0) nx -= segmentWidth; // normalize to [-w, 0)
-      targetX = nx;
-    }
-    setTrackX(targetX);
+    // Calculate the base position for this index in the first segment
+    const baseTargetX = -(index * (itemWidth + gap)) + (viewportWidth / 2) - (itemWidth / 2);
+    
+    // Instead of jumping, find the closest equivalent position to current trackX
+    setTrackX(prevX => {
+      const segmentWidth = segmentWidthRef.current;
+      if (segmentWidth <= 0) return baseTargetX;
+      
+      // Find all possible positions for this index across segments
+      const positions = [
+        baseTargetX,                  // First segment
+        baseTargetX - segmentWidth,   // Second segment
+        baseTargetX + segmentWidth    // If we need to go forward
+      ];
+      
+      // Choose the position closest to current position to avoid jumps
+      return positions.reduce((closest, pos) => 
+        Math.abs(pos - prevX) < Math.abs(closest - prevX) ? pos : closest
+      );
+    });
   }, []);
 
   // Use custom touch gestures hook
