@@ -145,19 +145,6 @@ const Help = styled(HelpBadge)`
   &:hover ${HelpTooltip} { opacity: 1; transform: translateY(0); border-color: var(--accent2); }
 `;
 
-const TitleAccent = styled.span`
-  color: var(--accent2);
-  font-size: 1.6em; /* oversize the f */
-  line-height: 0.9;
-  display: inline-block;
-
-  /* Mobile optimizations */
-  @media (max-width: 768px) {
-    font-size: 1.4em;
-    line-height: 1;
-  }
-`;
-
 // Mobile-specific title without 's'
 const MobileTitle = styled.h1`
   display: none;
