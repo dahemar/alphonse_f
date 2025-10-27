@@ -213,9 +213,7 @@ function App() {
   useEffect(() => {
     const loadContent = async () => {
       try {
-        console.log('App: Starting to load content...');
         const data = await contentManager.getData(); // Wait for data to be ready
-        console.log('App: Content loaded successfully:', data);
         
         if (data) {
           setBio(data.bio);

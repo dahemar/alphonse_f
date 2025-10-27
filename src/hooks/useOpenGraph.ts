@@ -33,11 +33,11 @@ const loadPreGeneratedData = async () => {
         const data = await response.json();
         preGeneratedData = data;
         dataLoaded = true;
-        console.log('✅ Loaded pre-generated thumbnail data:', data.length, 'items');
+        // Loaded pre-generated thumbnail data
       }
     }
   } catch (error) {
-    console.log('⚠️  Could not load pre-generated data:', error);
+    // Could not load pre-generated data
   }
 };
 
@@ -78,7 +78,7 @@ export const useOpenGraph = (url: string): UseOpenGraphReturn => {
               }
             }
           } catch (localErr) {
-            console.log('Local API failed, falling back to pre-generated data');
+            // Local API failed, falling back to pre-generated data
           }
         }
 
@@ -90,11 +90,11 @@ export const useOpenGraph = (url: string): UseOpenGraphReturn => {
         
         const preGenerated = preGeneratedData.find(item => item.url === url);
         if (preGenerated) {
-          console.log('Using pre-generated data for:', url);
+            // Using pre-generated data
           setData(preGenerated);
           ogCache.set(url, preGenerated);
         } else {
-          console.log('No pre-generated data found for:', url);
+          // No pre-generated data found
           const domain = new URL(url).hostname.replace('www.', '');
           const fallback = { title: '', description: '', image: '', url, domain };
           setData(fallback);

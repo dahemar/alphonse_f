@@ -240,7 +240,6 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
     const imageToShow = getHardcodedUrl(url) || '';
 
     if (imageToShow) {
-      console.log('Rendering image for:', url, 'Image URL:', imageToShow);
       return (
         <ThumbnailImage
           $size={$size}
@@ -259,7 +258,7 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
       );
     }
 
-    console.log('No hardcoded image for:', url, 'Data:', data, 'Error:', error);
+    // No hardcoded image found
     return (
       <FallbackThumbnail className="fallback" $size={$size}>
         <FallbackTitle>

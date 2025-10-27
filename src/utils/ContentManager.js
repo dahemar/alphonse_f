@@ -17,7 +17,7 @@ class ContentManager {
     }
     
     try {
-      console.log('Initializing ContentManager...');
+      // Initializing ContentManager
       const data = await this.fetchData();
       this.isInitialized = true;
       return data;
@@ -47,11 +47,8 @@ class ContentManager {
     try {
       // Check cache first with longer duration
       if (this.cache && (Date.now() - this.lastFetch) < this.CACHE_DURATION) {
-        console.log('Using cached data (age:', Math.round((Date.now() - this.lastFetch) / 1000), 's)');
         return this.cache;
       }
-
-      console.log('Fetching fresh data from Google Sheets...');
       
       // Use direct Google Sheets API call with specific range
       // Format: kenna!A2:D (skip header row, get columns A-D)
@@ -70,7 +67,6 @@ class ContentManager {
       }
 
       const result = await response.json();
-      console.log('Raw API response received');
       
       const values = result.values;
 
@@ -120,7 +116,6 @@ class ContentManager {
       this.cache = data;
       this.lastFetch = Date.now();
       
-      console.log('Data fetched successfully:', `${links.length} articles, bio length: ${bio.length}`);
       return data;
       
     } catch (error) {
