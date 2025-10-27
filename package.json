@@ -2,7 +2,7 @@
   "name": "alphonse_f",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://dahemar.github.io/alphonse_f",
+  "homepage": "/",
   "dependencies": {
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.7.0",
@@ -28,8 +28,7 @@
     "start:client": "react-scripts start",
     "start:server": "node server.js",
     "start": "concurrently -k -n client,server -c auto \"npm:start:client\" \"npm:start:server\"",
-    "build": "react-scripts build",
-    "build:vercel": "cross-env PUBLIC_URL= react-scripts build && node scripts/generate-thumbnails.js",
+    "build": "react-scripts build && node scripts/generate-thumbnails.js",
     "postbuild": "node scripts/generate-thumbnails.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
