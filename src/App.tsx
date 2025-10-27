@@ -45,10 +45,18 @@ const ContentWrapper = styled.div`
   }
 `;
 
+const TitleContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    margin-bottom: 0.6rem;
+  }
+`;
+
 const BioButton = styled.button`
-  position: fixed;
-  top: calc(2rem + 1.25rem + 0.5rem + 1rem + 32px); /* Match title + bio vertical position + 32px */
-  right: 12px;
   appearance: none;
   border: 1px solid var(--accent1);
   background: transparent;
@@ -62,7 +70,6 @@ const BioButton = styled.button`
   cursor: pointer;
   transition: border-color 120ms linear, color 120ms linear;
   outline: none;
-  z-index: 1000;
   line-height: 1.4;
   
   /* Remove any focus outlines that might appear */
@@ -78,8 +85,6 @@ const BioButton = styled.button`
 
   /* Mobile touch-friendly sizing */
   @media (max-width: 768px) {
-    top: calc(3.25rem + env(safe-area-inset-top) + 1.25rem + 0.5rem + 0.5rem + 32px); /* Match mobile title + bio position + 32px */
-    right: 8px;
     padding: 8px 14px;
     font-size: 13px;
     min-height: 36px;
@@ -307,14 +312,16 @@ function App() {
 
   return (
     <AppContainer>
-      <BioButton onClick={() => setIsBioOpen(true)}>bio</BioButton>
       <ContentWrapper>
-        <DesktopTitle>
-          kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
-        </DesktopTitle>
-        <MobileTitle>
-          kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
-        </MobileTitle>
+        <TitleContainer>
+          <DesktopTitle>
+            kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
+          </DesktopTitle>
+          <MobileTitle>
+            kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
+          </MobileTitle>
+          <BioButton onClick={() => setIsBioOpen(true)}>bio</BioButton>
+        </TitleContainer>
         
         {isReady && (
           <Suspense fallback={null}>
