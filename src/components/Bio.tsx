@@ -7,6 +7,7 @@ interface BioProps {
 
 const BioContainer = styled.div`
   margin-bottom: 4rem;
+  margin-top: -16px;
 
   /* Mobile spacing */
   @media (max-width: 768px) {
