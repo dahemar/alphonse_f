@@ -11,7 +11,8 @@ const BioContainer = styled.div`
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin-bottom: 1rem; /* 1.25rem - 0.25rem (4px) */
+    margin-top: -6px; /* -16px + 10px */
+    margin-bottom: 0.75rem; /* 1rem - 0.25rem (4px) */
   }
 `;
 
