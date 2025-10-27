@@ -47,15 +47,15 @@ const ContentWrapper = styled.div`
 
 const BioButton = styled.button`
   position: fixed;
-  top: 12px;
+  top: calc(2rem + 1.25rem + 0.5rem + 1rem); /* Match title + bio vertical position */
   right: 12px;
   appearance: none;
   border: 1px solid var(--accent1);
   background: transparent;
   color: var(--fg);
-  padding: 4px 10px;
+  padding: 6px 14px;
   border-radius: 0;
-  font-size: 12px;
+  font-size: 14px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -63,6 +63,7 @@ const BioButton = styled.button`
   transition: border-color 120ms linear, color 120ms linear;
   outline: none;
   z-index: 1000;
+  line-height: 1.4;
   
   /* Remove any focus outlines that might appear */
   &:focus,
@@ -77,12 +78,12 @@ const BioButton = styled.button`
 
   /* Mobile touch-friendly sizing */
   @media (max-width: 768px) {
-    top: calc(env(safe-area-inset-top) + 8px);
+    top: calc(3.25rem + env(safe-area-inset-top) + 1.25rem + 0.5rem + 0.5rem); /* Match mobile title + bio position */
     right: 8px;
-    padding: 6px 12px;
-    font-size: 11px;
-    min-height: 32px;
-    min-width: 44px;
+    padding: 8px 14px;
+    font-size: 13px;
+    min-height: 36px;
+    min-width: 50px;
   }
 `;
 
