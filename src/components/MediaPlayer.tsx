@@ -212,14 +212,13 @@ const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white; /* use white and invert against backdrop */
+  color: #666666;
   font-size: 1rem; /* Increased from 0.8rem */
   opacity: ${props => props.$isVisible ? 0.9 : 0};
   pointer-events: none;
   z-index: 15;
-  mix-blend-mode: difference; /* invert against whatever is behind */
   font-weight: 500;
-  text-shadow: none;
+  text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
   transition: opacity 1.5s ease-in-out;
 
   /* Slow blinking animation when visible */
