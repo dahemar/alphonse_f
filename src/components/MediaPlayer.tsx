@@ -286,15 +286,15 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   // Use custom touch gestures hook
   const { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, isSwiping } = useTouchGestures(
     () => {
-      // Swipe left - go to next
-      const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
+      // Swipe left - go to previous
+      const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
       onLinkChange(newIndex);
       // Center after selection change
       scrollToCenterItem(newIndex);
     },
     () => {
-      // Swipe right - go to previous
-      const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
+      // Swipe right - go to next
+      const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
       onLinkChange(newIndex);
       // Center after selection change
       scrollToCenterItem(newIndex);
@@ -441,7 +441,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   // Keep desktop arrow/click navigation centering
 
   const scrollLeftIndex = React.useCallback(() => {
-    const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
+    const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
     onLinkChange(newIndex);
     
     // Auto-scroll to center the selected item on desktop
@@ -449,7 +449,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
   }, [currentIndex, links.length, onLinkChange, scrollToCenterItem]);
 
   const scrollRightIndex = React.useCallback(() => {
-    const newIndex = currentIndex === links.length - 1 ? 0 : currentIndex + 1;
+    const newIndex = currentIndex === 0 ? links.length - 1 : currentIndex - 1;
     onLinkChange(newIndex);
     
     // Auto-scroll to center the selected item on desktop
