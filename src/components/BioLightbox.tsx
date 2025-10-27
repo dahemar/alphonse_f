@@ -12,25 +12,25 @@ const Overlay = styled.div<{ $isOpen: boolean }>`
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(255, 255, 255, 0.95);
   display: ${props => props.$isOpen ? 'flex' : 'none'};
   align-items: center;
   justify-content: center;
   z-index: 10000;
   padding: 2rem;
   opacity: ${props => props.$isOpen ? 1 : 0};
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease;
 `;
 
 const LightboxContent = styled.div`
-  background: #FFFFFF;
+  background: transparent;
   color: #000000;
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
   padding: 3rem 2.5rem;
   position: relative;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  border: 1px solid #000000;
   
   @media (max-width: 768px) {
     padding: 2rem 1.5rem;
@@ -44,34 +44,36 @@ const CloseButton = styled.button`
   top: 1rem;
   right: 1rem;
   background: transparent;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
+  border: 1px solid #000000;
   color: #000000;
+  padding: 4px 10px;
+  font-size: 14px;
+  cursor: pointer;
   line-height: 1;
-  padding: 0.5rem;
-  transition: opacity 0.2s ease;
+  transition: border-color 120ms linear;
+  font-family: 'Times New Roman', Times, serif;
   
   &:hover {
-    opacity: 0.6;
+    border-color: #333333;
   }
   
   @media (max-width: 768px) {
-    font-size: 1.5rem;
     top: 0.5rem;
     right: 0.5rem;
+    font-size: 12px;
+    padding: 4px 8px;
   }
 `;
 
 const BioText = styled.div`
-  font-size: 1.1rem;
-  line-height: 1.8;
+  font-size: 1rem;
+  line-height: 1.6;
   color: #000000;
   font-family: 'Times New Roman', Times, serif;
   
   @media (max-width: 768px) {
-    font-size: 1rem;
-    line-height: 1.6;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 `;
 
@@ -87,7 +89,7 @@ const BioLightbox: React.FC<BioLightboxProps> = ({ isOpen, onClose }) => {
   return (
     <Overlay $isOpen={isOpen} onClick={onClose}>
       <LightboxContent onClick={(e) => e.stopPropagation()}>
-        <CloseButton onClick={onClose}>×</CloseButton>
+        <CloseButton onClick={onClose}>close</CloseButton>
         <BioText>{loremText.trim()}</BioText>
       </LightboxContent>
     </Overlay>
