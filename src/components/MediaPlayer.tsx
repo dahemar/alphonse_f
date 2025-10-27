@@ -132,15 +132,13 @@ const FadeOverlay = styled.div<{ $position: 'left' | 'right' }>`
   top: 0;
   left: ${props => props.$position === 'left' ? '0' : 'auto'};
   right: ${props => props.$position === 'right' ? '0' : 'auto'};
-  width: 100px;
+  width: 80px;
   height: 100%;
   background: ${props => props.$position === 'left'
-    ? 'linear-gradient(to right, white 0%, rgba(255, 255, 255, 0.95) 15%, rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 0.4) 70%, transparent 100%)'
-    : 'linear-gradient(to left, white 0%, rgba(255, 255, 255, 0.95) 15%, rgba(255, 255, 255, 0.8) 40%, rgba(255, 255, 255, 0.4) 70%, transparent 100%)'
+    ? 'linear-gradient(to right, #C0C0C0 0%, rgba(192, 192, 192, 0.8) 50%, transparent 100%)'
+    : 'linear-gradient(to left, #C0C0C0 0%, rgba(192, 192, 192, 0.8) 50%, transparent 100%)'
   };
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  pointer-events: none;
+  pointer-events: none; /* allow viewport to receive mouse events */
   z-index: 5;
 
   /* Hide on mobile for better touch experience */
