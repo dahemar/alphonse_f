@@ -6,12 +6,12 @@ interface BioProps {
 }
 
 const BioContainer = styled.div`
-  margin-bottom: 4rem;
+  margin-bottom: 3.375rem; /* 4rem - 0.625rem (10px) */
   margin-top: -16px;
 
   /* Mobile spacing */
   @media (max-width: 768px) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1rem; /* 1.25rem - 0.25rem (4px) */
   }
 `;
 
