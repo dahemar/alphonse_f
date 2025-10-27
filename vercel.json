@@ -5,18 +5,6 @@
   "installCommand": "npm install --legacy-peer-deps",
   "rewrites": [
     {
-      "source": "/static/*",
-      "destination": "/static/*"
-    },
-    {
-      "source": "/assets/*",
-      "destination": "/assets/*"
-    },
-    {
-      "source": "/manifest.json",
-      "destination": "/manifest.json"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
