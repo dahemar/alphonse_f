@@ -236,6 +236,7 @@ const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
 
   @media (max-width: 768px) {
     display: block;
+    font-size: 1.3rem; /* Larger on mobile */
   }
 `;
 
