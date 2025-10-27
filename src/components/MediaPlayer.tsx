@@ -220,6 +220,9 @@ const SwipeIndicator = styled.div<{ $isVisible: boolean }>`
   font-weight: 500;
   text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
   transition: opacity 1.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 
   /* Slow blinking animation when visible */
   @keyframes slowBlink {
@@ -555,7 +558,9 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           </OverlayLayer>
                       {isMobile && (
               <SwipeIndicator $isVisible={!isScrolling}>
-                swipe to navigate
+                <span>←</span>
+                <span>swipe to navigate</span>
+                <span>→</span>
               </SwipeIndicator>
             )}
         </Viewport>
