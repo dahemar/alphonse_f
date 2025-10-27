@@ -29,7 +29,7 @@
     "start:server": "node server.js",
     "start": "concurrently -k -n client,server -c auto \"npm:start:client\" \"npm:start:server\"",
     "build": "react-scripts build",
-    "build:vercel": "cross-env PUBLIC_URL= react-scripts build",
+    "build:vercel": "cross-env PUBLIC_URL= react-scripts build && node scripts/generate-thumbnails.js",
     "postbuild": "node scripts/generate-thumbnails.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
