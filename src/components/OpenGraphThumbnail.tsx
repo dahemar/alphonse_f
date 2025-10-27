@@ -201,12 +201,20 @@ const HARDCODED_FILES: Record<string, string> = {
 function getHardcodedUrl(linkUrl: string): string | null {
   const filename = HARDCODED_FILES[linkUrl];
   if (!filename) return null;
-  const isGh = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
-  if (isGh) {
+  
+  // Detect environment
+  const isGitHubPages = typeof window !== 'undefined' && window.location.hostname.includes('github.io');
+  const isLocalDev = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  
+  if (isGitHubPages) {
     return `/alphonse_f/assets/fallback/${filename}`;
+  } else if (isLocalDev) {
+    // Local dev served from Express
+    return `http://localhost:4000/assets/fallback/${filename}`;
+  } else {
+    // Production (Vercel or other hosting)
+    return `/assets/fallback/${filename}`;
   }
-  // Local dev served from Express
-  return `http://localhost:4000/assets/fallback/${filename}`;
 }
 
 const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
