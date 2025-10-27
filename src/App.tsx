@@ -1,21 +1,20 @@
 import React, { useState, useEffect, Suspense, lazy, useCallback } from 'react';
 import styled from 'styled-components';
 import contentManager from './utils/ContentManager';
+import BioLightbox from './components/BioLightbox';
 
 // Lazy load heavy components
 const MediaPlayer = lazy(() => import('./components/MediaPlayer'));
 const Bio = lazy(() => import('./components/Bio'));
 const OrnamentalDivider = lazy(() => import('./components/OrnamentalDivider'));
 
-type Mode = 'evil' | 'angel' | 'regular';
-
-const AppContainer = styled.div<{ $mode: Mode }>`
+const AppContainer = styled.div`
   min-height: 100dvh; /* use dynamic viewport height */
-  /* Color scheme variables per mode */
-  --bg: ${p => (p.$mode === 'evil' ? '#000000' : p.$mode === 'angel' ? '#FFFFFF' : '#FFFFFF')};
-  --fg: ${p => (p.$mode === 'evil' ? '#FFFF00' : p.$mode === 'angel' ? '#1A73E8' : '#000000')};
-  --accent1: ${p => (p.$mode === 'evil' ? '#FFFF00' : p.$mode === 'angel' ? '#1A73E8' : '#000000')};
-  --accent2: ${p => (p.$mode === 'evil' ? '#FF3B30' : p.$mode === 'angel' ? '#00C853' : '#000000')};
+  /* Regular color scheme */
+  --bg: #FFFFFF;
+  --fg: #000000;
+  --accent1: #000000;
+  --accent2: #000000;
   background: var(--bg);
   display: flex;
   flex-direction: column;
@@ -46,25 +45,12 @@ const ContentWrapper = styled.div`
   }
 `;
 
-const ModeSwitcher = styled.div`
+const BioButton = styled.button`
   position: fixed;
   top: 12px;
   right: 12px;
-  display: flex;
-  gap: 8px;
-  z-index: 1000;
-
-  /* Mobile positioning and sizing */
-  @media (max-width: 768px) {
-    top: calc(env(safe-area-inset-top) + 8px);
-    right: 8px;
-    gap: 6px;
-  }
-`;
-
-const ModeOption = styled.button<{ $active?: boolean }>`
   appearance: none;
-  border: 1px solid ${p => (p.$active ? 'var(--accent2)' : 'var(--accent1)')};
+  border: 1px solid var(--accent1);
   background: transparent;
   color: var(--fg);
   padding: 4px 10px;
@@ -76,6 +62,7 @@ const ModeOption = styled.button<{ $active?: boolean }>`
   cursor: pointer;
   transition: border-color 120ms linear, color 120ms linear;
   outline: none;
+  z-index: 1000;
   
   /* Remove any focus outlines that might appear */
   &:focus,
@@ -83,9 +70,15 @@ const ModeOption = styled.button<{ $active?: boolean }>`
     outline: none;
     box-shadow: none;
   }
+  
+  &:hover {
+    border-color: var(--accent2);
+  }
 
   /* Mobile touch-friendly sizing */
   @media (max-width: 768px) {
+    top: calc(env(safe-area-inset-top) + 8px);
+    right: 8px;
     padding: 6px 12px;
     font-size: 11px;
     min-height: 32px;
@@ -204,7 +197,7 @@ const DesktopTitle = styled.h1`
 
 function App() {
   const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
-  const [mode, setMode] = useState<Mode>('regular');
+  const [isBioOpen, setIsBioOpen] = useState(false);
   const [bio, setBio] = useState('');
   const [links, setLinks] = useState<Array<{url: string; title: string; domain: string; thumbnail?: string}>>([]);
   const [isReady, setIsReady] = useState(false);
@@ -312,18 +305,14 @@ function App() {
   }, []);
 
   return (
-    <AppContainer $mode={mode}>
-      <ModeSwitcher>
-        <ModeOption title="evil" aria-label="evil" $active={mode === 'evil'} onClick={() => setMode('evil')}>evil</ModeOption>
-        <ModeOption title="angel" aria-label="angel" $active={mode === 'angel'} onClick={() => setMode('angel')}>angel</ModeOption>
-        <ModeOption title="regular" aria-label="regular" $active={mode === 'regular'} onClick={() => setMode('regular')}>regular</ModeOption>
-      </ModeSwitcher>
+    <AppContainer>
+      <BioButton onClick={() => setIsBioOpen(true)}>bio</BioButton>
       <ContentWrapper>
         <DesktopTitle>
-          {mode === 'regular' ? <>kenna mccafferty<InvisibleAccent>f</InvisibleAccent></> : <>alphonse <TitleAccent>f</TitleAccent></>}
+          kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
         </DesktopTitle>
         <MobileTitle>
-          {mode === 'regular' ? <>kenna mccafferty<InvisibleAccent>f</InvisibleAccent></> : <>alphonse <TitleAccent>f</TitleAccent></>}
+          kenna mccafferty<InvisibleAccent>f</InvisibleAccent>
         </MobileTitle>
         
         {isReady && (
@@ -332,9 +321,9 @@ function App() {
           </Suspense>
         )}
       </ContentWrapper>
-              <Suspense fallback={null}>
-          <OrnamentalDivider mode={mode} />
-        </Suspense>
+      <Suspense fallback={null}>
+        <OrnamentalDivider mode="regular" />
+      </Suspense>
       <ContentWrapper>
         {isReady && (
           <Suspense fallback={null}>
@@ -342,17 +331,12 @@ function App() {
               links={links}
               currentIndex={currentLinkIndex}
               onLinkChange={handleLinkChange}
-              invertScroll={mode === 'evil'}
+              invertScroll={false}
             />
           </Suspense>
         )}
       </ContentWrapper>
-              {mode !== 'regular' && (
-          <Help>
-            <HelpSymbol>§</HelpSymbol>
-            <HelpTooltip>click on objects to reach other layers of information</HelpTooltip>
-          </Help>
-        )}
+      <BioLightbox isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} />
     </AppContainer>
   );
 }
