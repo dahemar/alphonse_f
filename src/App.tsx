@@ -71,6 +71,7 @@ const BioButton = styled.button`
   transition: border-color 120ms linear, color 120ms linear;
   outline: none;
   line-height: 1.4;
+  transform: translateY(5px);
   
   /* Remove any focus outlines that might appear */
   &:focus,
