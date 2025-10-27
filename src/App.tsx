@@ -47,7 +47,7 @@ const ContentWrapper = styled.div`
 
 const BioButton = styled.button`
   position: fixed;
-  top: calc(2rem + 1.25rem + 0.5rem + 1rem); /* Match title + bio vertical position */
+  top: calc(2rem + 1.25rem + 0.5rem + 1rem + 32px); /* Match title + bio vertical position + 32px */
   right: 12px;
   appearance: none;
   border: 1px solid var(--accent1);
@@ -78,7 +78,7 @@ const BioButton = styled.button`
 
   /* Mobile touch-friendly sizing */
   @media (max-width: 768px) {
-    top: calc(3.25rem + env(safe-area-inset-top) + 1.25rem + 0.5rem + 0.5rem); /* Match mobile title + bio position */
+    top: calc(3.25rem + env(safe-area-inset-top) + 1.25rem + 0.5rem + 0.5rem + 32px); /* Match mobile title + bio position + 32px */
     right: 8px;
     padding: 8px 14px;
     font-size: 13px;
