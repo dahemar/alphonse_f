@@ -7,12 +7,57 @@ class ContentManager {
     this.CACHE_DURATION = 1 * 60 * 1000; // 1 minute cache
     this.preloadPromise = null;
     this.isInitialized = false;
+    this.LOCAL_STORAGE_KEY = 'content-manager-cache-v1';
+  }
+
+  loadFromStorage() {
+    if (typeof window === 'undefined') return null;
+    try {
+      const raw = window.localStorage.getItem(this.LOCAL_STORAGE_KEY);
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || !parsed.timestamp || !parsed.data) return null;
+      if (Date.now() - parsed.timestamp > this.CACHE_DURATION) return null;
+      this.cache = parsed.data;
+      this.lastFetch = parsed.timestamp;
+      this.isInitialized = true;
+      return parsed.data;
+    } catch (error) {
+      console.warn('ContentManager: failed to load from storage', error);
+      return null;
+    }
+  }
+
+  saveToStorage(data) {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.setItem(this.LOCAL_STORAGE_KEY, JSON.stringify({
+        timestamp: Date.now(),
+        data
+      }));
+    } catch (error) {
+      console.warn('ContentManager: failed to save to storage', error);
+    }
+  }
+
+  clearStorage() {
+    if (typeof window === 'undefined') return;
+    try {
+      window.localStorage.removeItem(this.LOCAL_STORAGE_KEY);
+    } catch (error) {
+      console.warn('ContentManager: failed to clear storage', error);
+    }
   }
 
   // Initialize and wait for data to be ready
   async initialize() {
     if (this.isInitialized) {
       return this.cache;
+    }
+
+    const cached = this.loadFromStorage();
+    if (cached) {
+      return cached;
     }
     
     try {
@@ -41,19 +86,17 @@ class ContentManager {
     return this.preloadPromise;
   }
 
-  async fetchSheetData(sheetName, range = '') {
-    const rangeParam = range ? `!${range}` : '';
-    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/${sheetName}${rangeParam}?key=${this.API_KEY}`;
-    
+  async fetchBatchData() {
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values:batchGet?ranges=Articles!A2:E&ranges=Bio!A2:B&key=${this.API_KEY}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
-    
+
     try {
       const response = await fetch(url, {
         signal: controller.signal,
         cache: 'default'
       });
-      
+
       clearTimeout(timeoutId);
 
       if (!response.ok) {
@@ -61,10 +104,10 @@ class ContentManager {
       }
 
       const result = await response.json();
-      return result.values || [];
+      return result.valueRanges || [];
     } catch (error) {
       if (error.name === 'AbortError') {
-        throw new Error(`Timeout fetching ${sheetName}`);
+        throw new Error('Timeout fetching Google Sheets data');
       }
       throw error;
     }
@@ -72,34 +115,27 @@ class ContentManager {
 
   async fetchData() {
     try {
-      // Check cache first
       if (this.cache && (Date.now() - this.lastFetch) < this.CACHE_DURATION) {
         return this.cache;
       }
-      
-      // Fetch data from multiple sheets in parallel
-      const [articlesData, bioData] = await Promise.all([
-        this.fetchSheetData('Articles', 'A2:E'), // Skip header row
-        this.fetchSheetData('Bio', 'A2:B') // Skip header row
-      ]);
 
-      // Parse Articles sheet
+      const valueRanges = await this.fetchBatchData();
+      const articlesData = valueRanges[0]?.values || [];
+      const bioData = valueRanges[1]?.values || [];
+
       const links = [];
-      if (articlesData && articlesData.length > 0) {
+      if (articlesData.length > 0) {
         for (const row of articlesData) {
           if (!row || row.length === 0) continue;
-          
-          // Expected columns: url, title, domain, thumbnail_url, order
-          if (row[0] && row[1] && row[2]) {
+          const [url, title, domain, thumbnailUrl, orderValue] = row;
+          if (url && title && domain) {
             const article = {
-              url: row[0].trim(),
-              title: row[1].trim(),
-              domain: row[2].trim(),
-              thumbnail: row[3] ? row[3].trim() : undefined,
-              order: row[4] ? parseInt(row[4], 10) : 999 // Default order if not specified
+              url: url.trim(),
+              title: title.trim(),
+              domain: domain.trim(),
+              thumbnail: thumbnailUrl ? thumbnailUrl.trim() : undefined,
+              order: orderValue ? parseInt(orderValue, 10) : 999
             };
-            
-            // Validate URL format
             try {
               new URL(article.url);
               links.push(article);
@@ -108,26 +144,17 @@ class ContentManager {
             }
           }
         }
-        
-        // Sort by order
         links.sort((a, b) => a.order - b.order);
       }
 
-      // Parse Bio sheet
       let bioSubtitle = '';
       let bioLightboxContent = '';
-      
-      if (bioData && bioData.length > 0) {
-        // First row: subtitle, second row: lightbox content
-        if (bioData[0] && bioData[0][0]) {
-          bioSubtitle = bioData[0][0].trim();
-        }
-        if (bioData[0] && bioData[0][1]) {
-          bioLightboxContent = bioData[0][1].trim();
-        }
-        // If there are multiple rows, first column is subtitle, second is lightbox
-        // But we can also have subtitle in row 0, lightbox in row 1
-        if (bioData.length > 1 && bioData[1] && bioData[1][0]) {
+
+      if (bioData.length > 0) {
+        const [subtitleCell, lightboxCell] = bioData[0];
+        if (subtitleCell) bioSubtitle = subtitleCell.trim();
+        if (lightboxCell) bioLightboxContent = lightboxCell.trim();
+        if (bioData.length > 1 && !bioLightboxContent && bioData[1]?.[0]) {
           bioLightboxContent = bioData[1][0].trim();
         }
       }
@@ -137,13 +164,13 @@ class ContentManager {
         bioLightbox: bioLightboxContent,
         links
       };
-      
-      // Update cache
+
       this.cache = data;
       this.lastFetch = Date.now();
-      
+      this.saveToStorage(data);
+
       return data;
-      
+
     } catch (error) {
       console.error('Error fetching Google Sheets data:', error);
       throw error;
@@ -155,14 +182,11 @@ class ContentManager {
     this.lastFetch = 0;
     this.preloadPromise = null;
     this.isInitialized = false;
+    this.clearStorage();
     return this.initialize();
   }
 }
 
-// Create and export a singleton instance
 const contentManager = new ContentManager();
-
-// Start preloading immediately
 contentManager.preload();
-
 export default contentManager;

@@ -228,8 +228,9 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
   $showInfo = true, // Default to true
   thumbnailUrl // Optional thumbnail from Google Sheets
 }) => {
-  // Keep dynamic system imported, but do not use it for images now
-  const { data, loading, error } = useOpenGraph(url);
+  const hardcodedImage = React.useMemo(() => getHardcodedUrl(url), [url]);
+  const shouldFetchOG = !thumbnailUrl && !hardcodedImage;
+  const { data, loading } = useOpenGraph(url, shouldFetchOG);
 
   const renderThumbnail = () => {
     if (loading) {
@@ -238,8 +239,10 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
       );
     }
 
-    // Priority: 1. thumbnailUrl from Google Sheets, 2. hardcoded mapping, 3. fallback
-    const imageToShow = thumbnailUrl || getHardcodedUrl(url) || '';
+    const ogImage = data?.image ? data.image : '';
+
+    // Priority: 1. thumbnailUrl from Google Sheets, 2. hardcoded mapping, 3. OG image, 4. fallback block
+    const imageToShow = thumbnailUrl || hardcodedImage || ogImage || '';
 
     if (imageToShow) {
       return (
@@ -250,7 +253,6 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
           referrerPolicy="no-referrer"
           loading={$size === 'large' ? 'eager' : 'lazy'}
           onError={(e) => {
-            // If hardcoded fails, show text fallback block
             const imgEl = e.currentTarget as HTMLImageElement;
             imgEl.style.display = 'none';
             const fb = imgEl.parentElement?.querySelector('.fallback');
@@ -260,7 +262,6 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
       );
     }
 
-    // No hardcoded image found
     return (
       <FallbackThumbnail className="fallback" $size={$size}>
         <FallbackTitle>

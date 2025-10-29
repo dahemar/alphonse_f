@@ -7,6 +7,7 @@ interface Link {
   url: string;
   title: string;
   domain: string;
+  thumbnail?: string;
 }
 
 interface MediaPlayerProps {

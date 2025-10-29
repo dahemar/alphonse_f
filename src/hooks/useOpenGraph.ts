@@ -49,15 +49,18 @@ if (typeof window !== 'undefined') {
   loadPreGeneratedData();
 }
 
-export const useOpenGraph = (url: string): UseOpenGraphReturn => {
+export const useOpenGraph = (url: string, enabled: boolean = true): UseOpenGraphReturn => {
   const [data, setData] = useState<OpenGraphData | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(enabled);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchOpenGraph = async () => {
-      if (!url) return;
+    if (!enabled || !url) {
+      setLoading(false);
+      return;
+    }
 
+    const fetchOpenGraph = async () => {
       // Serve from cache immediately if present
       const cached = ogCache.get(url);
       if (cached) {
@@ -124,7 +127,7 @@ export const useOpenGraph = (url: string): UseOpenGraphReturn => {
     };
 
     fetchOpenGraph();
-  }, [url]);
+  }, [url, enabled]);
 
   return { data, loading, error };
 };
