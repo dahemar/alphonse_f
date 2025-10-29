@@ -246,7 +246,7 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
           src={imageToShow}
           alt={fallbackTitle}
           referrerPolicy="no-referrer"
-          loading="lazy"
+          loading={$size === 'large' ? 'eager' : 'lazy'}
           onError={(e) => {
             // If hardcoded fails, show text fallback block
             const imgEl = e.currentTarget as HTMLImageElement;

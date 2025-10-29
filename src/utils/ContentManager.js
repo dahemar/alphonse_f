@@ -53,11 +53,14 @@ class ContentManager {
       // Use direct Google Sheets API call with specific range
       // Format: kenna!A2:D (skip header row, get columns A-D)
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout for faster failure
       
       const response = await fetch(
         `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/kenna!A2:D?key=${this.API_KEY}`,
-        { signal: controller.signal }
+        { 
+          signal: controller.signal,
+          cache: 'default' // Allow browser caching
+        }
       );
       
       clearTimeout(timeoutId);

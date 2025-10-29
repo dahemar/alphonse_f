@@ -93,73 +93,6 @@ const BioButton = styled.button`
   }
 `;
 
-const HelpBadge = styled.div`
-  position: fixed;
-  right: 14px;
-  bottom: 14px;
-  z-index: 1000;
-
-  /* Hide on mobile */
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const HelpSymbol = styled.div`
-  font-size: 24px;
-  line-height: 1;
-  color: var(--accent1);
-  cursor: default;
-  transition: color 120ms linear;
-
-  /* Mobile sizing */
-  @media (max-width: 768px) {
-    font-size: 20px;
-  }
-`;
-
-const HelpTooltip = styled.div`
-  position: absolute;
-  right: 0;
-  bottom: 28px;
-  white-space: nowrap;
-  color: var(--fg);
-  border: 1px solid var(--accent1);
-  padding: 6px 8px;
-  font-size: 12px;
-  background: transparent;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: opacity 140ms linear, transform 140ms linear, border-color 120ms linear, color 120ms linear;
-  pointer-events: none;
-
-  /* Mobile optimizations */
-  @media (max-width: 768px) {
-    font-size: 11px;
-    padding: 4px 6px;
-    white-space: normal;
-    max-width: 120px;
-    text-align: center;
-  }
-`;
-
-const Help = styled(HelpBadge)`
-  &:hover ${HelpSymbol} { color: var(--accent2); }
-  &:hover ${HelpTooltip} { opacity: 1; transform: translateY(0); border-color: var(--accent2); }
-`;
-
-const TitleAccent = styled.span`
-  color: var(--accent2);
-  font-size: 1.6em; /* oversize the f */
-  line-height: 0.9;
-  display: inline-block;
-
-  /* Mobile optimizations */
-  @media (max-width: 768px) {
-    font-size: 1.4em;
-    line-height: 1;
-  }
-`;
 
 const InvisibleAccent = styled.span`
   color: var(--bg); /* Same color as background - invisible */
@@ -219,6 +152,31 @@ function App() {
           setBio(data.bio);
           setLinks(data.links);
           setIsReady(true);
+          
+          // Preload first large image immediately for faster rendering
+          if (data.links && data.links.length > 0) {
+            const firstLink = data.links[1] || data.links[0]; // Start with second element (index 1)
+            // Get hardcoded image URL if available
+            const hardcodedMap: Record<string, string> = {
+              'https://www.papermag.com/bktherula-lvl5': '1.webp',
+              'https://www.papermag.com/joanne-robertson-blue-car': '2.webp',
+              'https://thecreativeindependent.com/people/painter-and-musician-joanne-robertson-on-why-its-never-just-you-creating-alone/': '3.jpg',
+              'https://www.ninaprotocol.com/articles/the-triumph-of-julias-war-recordings-the-indie-rock-antilabel-embracing-cassette-tapes-and-90s-rave-sounds': '4.webp',
+              'https://officemagazine.net/building-intensity-ouri': '5.jpg',
+              'https://www.altpress.com/sean-kennedy-olth-interview/': '6.jpg',
+              'https://www.are.na/editorial/the-future-will-be-like-perfume': '7.png',
+              'https://www.papermag.com/palmistry-tinkerbell-interview': '8.webp'
+            };
+            const filename = hardcodedMap[firstLink.url];
+            if (filename) {
+              const imageUrl = `/assets/fallback/${filename}`;
+              const link = document.createElement('link');
+              link.rel = 'preload';
+              link.as = 'image';
+              link.href = imageUrl;
+              document.head.appendChild(link);
+            }
+          }
         }
       } catch (error) {
         console.error('App: Failed to load content:', error);

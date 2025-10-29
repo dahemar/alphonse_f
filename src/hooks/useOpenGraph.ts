@@ -21,25 +21,33 @@ const ogCache: Map<string, OpenGraphData> = new Map();
 let preGeneratedData: OpenGraphData[] = [];
 let dataLoaded = false;
 
-// Try to load pre-generated data
+// Try to load pre-generated data immediately
 const loadPreGeneratedData = async () => {
   if (dataLoaded) return;
   
   try {
-    // In production (GitHub Pages), this will be available
-    if (typeof window !== 'undefined' && window.location.hostname.includes('github.io')) {
-      const response = await fetch('/alphonse_f/thumbnail-data.json');
-      if (response.ok) {
-        const data = await response.json();
-        preGeneratedData = data;
-        dataLoaded = true;
-        // Loaded pre-generated thumbnail data
-      }
+    // Try to load from current domain (works for Vercel and GitHub Pages)
+    const basePath = typeof window !== 'undefined' && window.location.hostname.includes('github.io') 
+      ? '/alphonse_f' 
+      : '';
+    const response = await fetch(`${basePath}/thumbnail-data.json`, {
+      // Add cache control to ensure browser reuses cached data
+      cache: 'force-cache'
+    });
+    if (response.ok) {
+      const data = await response.json();
+      preGeneratedData = data;
+      dataLoaded = true;
     }
   } catch (error) {
-    // Could not load pre-generated data
+    // Could not load pre-generated data - silent fail
   }
 };
+
+// Preload thumbnail data immediately when module loads
+if (typeof window !== 'undefined') {
+  loadPreGeneratedData();
+}
 
 export const useOpenGraph = (url: string): UseOpenGraphReturn => {
   const [data, setData] = useState<OpenGraphData | null>(null);
