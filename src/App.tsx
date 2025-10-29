@@ -139,6 +139,7 @@ function App() {
   const [currentLinkIndex, setCurrentLinkIndex] = useState(1); // Always start with second element
   const [isBioOpen, setIsBioOpen] = useState(false);
   const [bio, setBio] = useState('');
+  const [bioLightbox, setBioLightbox] = useState('');
   const [links, setLinks] = useState<Array<{url: string; title: string; domain: string; thumbnail?: string}>>([]);
   const [isReady, setIsReady] = useState(false);
 
@@ -149,27 +150,39 @@ function App() {
         const data = await contentManager.getData(); // Wait for data to be ready
         
         if (data) {
-          setBio(data.bio);
-          setLinks(data.links);
+          setBio(data.bio || '');
+          setBioLightbox(data.bioLightbox || '');
+          setLinks(data.links || []);
           setIsReady(true);
           
           // Preload first large image immediately for faster rendering
           if (data.links && data.links.length > 0) {
             const firstLink = data.links[1] || data.links[0]; // Start with second element (index 1)
-            // Get hardcoded image URL if available
-            const hardcodedMap: Record<string, string> = {
-              'https://www.papermag.com/bktherula-lvl5': '1.webp',
-              'https://www.papermag.com/joanne-robertson-blue-car': '2.webp',
-              'https://thecreativeindependent.com/people/painter-and-musician-joanne-robertson-on-why-its-never-just-you-creating-alone/': '3.jpg',
-              'https://www.ninaprotocol.com/articles/the-triumph-of-julias-war-recordings-the-indie-rock-antilabel-embracing-cassette-tapes-and-90s-rave-sounds': '4.webp',
-              'https://officemagazine.net/building-intensity-ouri': '5.jpg',
-              'https://www.altpress.com/sean-kennedy-olth-interview/': '6.jpg',
-              'https://www.are.na/editorial/the-future-will-be-like-perfume': '7.png',
-              'https://www.papermag.com/palmistry-tinkerbell-interview': '8.webp'
-            };
-            const filename = hardcodedMap[firstLink.url];
-            if (filename) {
-              const imageUrl = `/assets/fallback/${filename}`;
+            
+            // Use thumbnail from Google Sheets if available, otherwise fallback to hardcoded
+            let imageUrl: string | null = null;
+            
+            if (firstLink.thumbnail) {
+              imageUrl = firstLink.thumbnail;
+            } else {
+              // Fallback to hardcoded mapping
+              const hardcodedMap: Record<string, string> = {
+                'https://www.papermag.com/bktherula-lvl5': '1.webp',
+                'https://www.papermag.com/joanne-robertson-blue-car': '2.webp',
+                'https://thecreativeindependent.com/people/painter-and-musician-joanne-robertson-on-why-its-never-just-you-creating-alone/': '3.jpg',
+                'https://www.ninaprotocol.com/articles/the-triumph-of-julias-war-recordings-the-indie-rock-antilabel-embracing-cassette-tapes-and-90s-rave-sounds': '4.webp',
+                'https://officemagazine.net/building-intensity-ouri': '5.jpg',
+                'https://www.altpress.com/sean-kennedy-olth-interview/': '6.jpg',
+                'https://www.are.na/editorial/the-future-will-be-like-perfume': '7.png',
+                'https://www.papermag.com/palmistry-tinkerbell-interview': '8.webp'
+              };
+              const filename = hardcodedMap[firstLink.url];
+              if (filename) {
+                imageUrl = `/assets/fallback/${filename}`;
+              }
+            }
+            
+            if (imageUrl) {
               const link = document.createElement('link');
               link.rel = 'preload';
               link.as = 'image';
@@ -303,7 +316,7 @@ function App() {
           </Suspense>
         )}
       </ContentWrapper>
-      <BioLightbox isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} />
+      <BioLightbox isOpen={isBioOpen} onClose={() => setIsBioOpen(false)} content={bioLightbox} />
     </AppContainer>
   );
 }

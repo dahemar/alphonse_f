@@ -10,6 +10,7 @@ interface OpenGraphThumbnailProps {
   onClick: () => void;
   $size?: 'large' | 'small';
   $showInfo?: boolean; // New prop to control info display
+  thumbnailUrl?: string; // Optional thumbnail URL from Google Sheets
 }
 
 const ThumbnailContainer = styled.div<{ $isActive: boolean; $size: 'large' | 'small' }>`
@@ -224,7 +225,8 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
   $isActive,
   onClick,
   $size = 'small',
-  $showInfo = true // Default to true
+  $showInfo = true, // Default to true
+  thumbnailUrl // Optional thumbnail from Google Sheets
 }) => {
   // Keep dynamic system imported, but do not use it for images now
   const { data, loading, error } = useOpenGraph(url);
@@ -236,8 +238,8 @@ const OpenGraphThumbnail: React.FC<OpenGraphThumbnailProps> = ({
       );
     }
 
-    // Always use hardcoded image mapping for now
-    const imageToShow = getHardcodedUrl(url) || '';
+    // Priority: 1. thumbnailUrl from Google Sheets, 2. hardcoded mapping, 3. fallback
+    const imageToShow = thumbnailUrl || getHardcodedUrl(url) || '';
 
     if (imageToShow) {
       return (

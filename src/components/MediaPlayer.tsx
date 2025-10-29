@@ -495,6 +495,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
               onClick={() => handlePlaylistClick(index)}
               $size="small"
               $showInfo={!isMobile}
+              thumbnailUrl={link.thumbnail}
             />
           </TrackItem>
         ))}
@@ -508,6 +509,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
               onClick={() => handlePlaylistClick(index)}
               $size="small"
               $showInfo={!isMobile}
+              thumbnailUrl={link.thumbnail}
             />
           </TrackItem>
         ))}
@@ -525,6 +527,7 @@ const MediaPlayer: React.FC<MediaPlayerProps> = ({ links, currentIndex, onLinkCh
           $isActive={true}
           onClick={() => {}}
           $size="large"
+          thumbnailUrl={currentLink.thumbnail}
         />
         {!isMobile && (
           <TrackInfo>

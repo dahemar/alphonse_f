@@ -1,8 +1,7 @@
 class ContentManager {
   constructor() {
     this.API_KEY = 'AIzaSyBHQgbSv588A3qr-Kzeo6YrZ9TbVNlrSkc';
-    this.SPREADSHEET_ID = '12sMGjn8DGuKlSmykoQqH_oMGowPZMo-qA3WDnHm2_tM';
-    this.SHEET_NAME = 'kenna';
+    this.SPREADSHEET_ID = '1OLoEI-7O9YNIuI-bVig1MNe63xocs_jPS3yLTgMB4zE';
     this.cache = null;
     this.lastFetch = 0;
     this.CACHE_DURATION = 1 * 60 * 1000; // 1 minute cache
@@ -17,7 +16,6 @@ class ContentManager {
     }
     
     try {
-      // Initializing ContentManager
       const data = await this.fetchData();
       this.isInitialized = true;
       return data;
@@ -43,25 +41,18 @@ class ContentManager {
     return this.preloadPromise;
   }
 
-  async fetchData() {
+  async fetchSheetData(sheetName, range = '') {
+    const rangeParam = range ? `!${range}` : '';
+    const url = `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/${sheetName}${rangeParam}?key=${this.API_KEY}`;
+    
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+    
     try {
-      // Check cache first with longer duration
-      if (this.cache && (Date.now() - this.lastFetch) < this.CACHE_DURATION) {
-        return this.cache;
-      }
-      
-      // Use direct Google Sheets API call with specific range
-      // Format: kenna!A2:D (skip header row, get columns A-D)
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout for faster failure
-      
-      const response = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${this.SPREADSHEET_ID}/values/kenna!A2:D?key=${this.API_KEY}`,
-        { 
-          signal: controller.signal,
-          cache: 'default' // Allow browser caching
-        }
-      );
+      const response = await fetch(url, {
+        signal: controller.signal,
+        cache: 'default'
+      });
       
       clearTimeout(timeoutId);
 
@@ -70,50 +61,82 @@ class ContentManager {
       }
 
       const result = await response.json();
-      
-      const values = result.values;
-
-      if (!values || values.length === 0) {
-        throw new Error('No data found in the sheet');
+      return result.values || [];
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        throw new Error(`Timeout fetching ${sheetName}`);
       }
+      throw error;
+    }
+  }
 
-      // Parse the data - simplified structure
-      // Row 0: Bio in column A
-      // Row 1+: Article data (url, title, domain, thumbnail)
+  async fetchData() {
+    try {
+      // Check cache first
+      if (this.cache && (Date.now() - this.lastFetch) < this.CACHE_DURATION) {
+        return this.cache;
+      }
       
-      let bio = '';
+      // Fetch data from multiple sheets in parallel
+      const [articlesData, bioData] = await Promise.all([
+        this.fetchSheetData('Articles', 'A2:E'), // Skip header row
+        this.fetchSheetData('Bio', 'A2:B') // Skip header row
+      ]);
+
+      // Parse Articles sheet
       const links = [];
-
-      // First row (index 0) should contain bio in column A
-      if (values[0] && values[0][0]) {
-        bio = values[0][0].trim();
+      if (articlesData && articlesData.length > 0) {
+        for (const row of articlesData) {
+          if (!row || row.length === 0) continue;
+          
+          // Expected columns: url, title, domain, thumbnail_url, order
+          if (row[0] && row[1] && row[2]) {
+            const article = {
+              url: row[0].trim(),
+              title: row[1].trim(),
+              domain: row[2].trim(),
+              thumbnail: row[3] ? row[3].trim() : undefined,
+              order: row[4] ? parseInt(row[4], 10) : 999 // Default order if not specified
+            };
+            
+            // Validate URL format
+            try {
+              new URL(article.url);
+              links.push(article);
+            } catch (urlError) {
+              console.warn('Invalid URL, skipping row:', row, urlError);
+            }
+          }
+        }
+        
+        // Sort by order
+        links.sort((a, b) => a.order - b.order);
       }
 
-      // Parse articles starting from second row (index 1)
-      for (let i = 1; i < values.length; i++) {
-        const row = values[i];
-        if (!row || row.length === 0) continue; // Skip empty rows
-        
-        // Check if this row has the minimum required data
-        if (row[0] && row[1] && row[2]) { // url, title, domain
-          const article = {
-            url: row[0].trim(),
-            title: row[1].trim(),
-            domain: row[2].trim(),
-            thumbnail: row[3] ? row[3].trim() : undefined
-          };
-          
-          // Validate URL format
-          try {
-            new URL(article.url);
-            links.push(article);
-          } catch (urlError) {
-            console.warn('Invalid URL, skipping row:', row, urlError);
-          }
+      // Parse Bio sheet
+      let bioSubtitle = '';
+      let bioLightboxContent = '';
+      
+      if (bioData && bioData.length > 0) {
+        // First row: subtitle, second row: lightbox content
+        if (bioData[0] && bioData[0][0]) {
+          bioSubtitle = bioData[0][0].trim();
+        }
+        if (bioData[0] && bioData[0][1]) {
+          bioLightboxContent = bioData[0][1].trim();
+        }
+        // If there are multiple rows, first column is subtitle, second is lightbox
+        // But we can also have subtitle in row 0, lightbox in row 1
+        if (bioData.length > 1 && bioData[1] && bioData[1][0]) {
+          bioLightboxContent = bioData[1][0].trim();
         }
       }
 
-      const data = { bio, links };
+      const data = {
+        bio: bioSubtitle,
+        bioLightbox: bioLightboxContent,
+        links
+      };
       
       // Update cache
       this.cache = data;
